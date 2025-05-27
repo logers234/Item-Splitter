@@ -1,17 +1,17 @@
 {
 	"schemaVersion": 1,
 	"id": "item-splitter",
-	"version": "${version}",
+	"version": "1.0.0",
 	"name": "Item Splitter",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Me!"
+		"Logan Gwin"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"sources": "https://github.com/logers234/Item-Splitter"
 	},
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/item-splitter/icon.png",
 	"environment": "*",
 	"entrypoints": {
@@ -20,6 +20,9 @@
 		],
 		"fabric-datagen": [
 			"net.logangwin.itemsplitter.ItemSplitterDataGenerator"
+		],
+		"client": [
+			"net.logangwin.itemsplitter.ItemSplitterClient"
 		]
 	},
 	"mixins": [
@@ -29,7 +32,8 @@
 		"fabricloader": ">=0.16.14",
 		"minecraft": "~1.21.1",
 		"java": ">=21",
-		"fabric-api": "*"
+		"fabric-api": "*",
+		"libgui": "*"
 	},
 	"suggests": {
 		"another-mod": "*"
