@@ -2,8 +2,9 @@
 	"required": true,
 	"package": "net.logangwin.itemsplitter.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": [
-		"ExampleMixin"
+	"client": [
+		"HandledScreenAccessor",
+		"HandledScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

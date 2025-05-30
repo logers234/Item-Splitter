@@ -33,6 +33,7 @@ public class GuiItem extends Item {
         return registeredItem;
     }
 
+    /*
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemSplitter.LOGGER.info("Item Used");
@@ -41,6 +42,7 @@ public class GuiItem extends Item {
         }
         return super.use(world, user, hand);
     }
+    */
 
     public static final Item GuiItem = register(new GuiItem(new Item.Settings()), "gui_item");
 
