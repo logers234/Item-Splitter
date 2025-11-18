@@ -43,7 +43,17 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         MinecraftClient client = MinecraftClient.getInstance();
+        ItemSplitter.LOGGER.error("Mouse Click");
+
         if (client.player == null) return;
+
+        if (mouseReleased) {
+            ItemSplitter.LOGGER.error("Mouse Released");
+            cir.setReturnValue(false);
+            cir.cancel();
+            mouseReleased = false;
+            return;
+        }
 
         if (client.player.currentScreenHandler.getCursorStack().isEmpty()) {
 
@@ -65,6 +75,7 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "mouseReleased", at = @At("HEAD"))
     private void onMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+            mouseReleased = true;
             ItemSplitter.LOGGER.info("Released Right Click");
 
             // Reset charge
@@ -76,16 +87,18 @@ public abstract class HandledScreenMixin extends Screen {
             }
         }
     }
+    @Unique
+    private static boolean mouseReleased = false;
 
     @Unique
     private void simulateStackSplit(HandledScreen<?> screen, double mouseX, double mouseY) {
         MinecraftClient client = MinecraftClient.getInstance();
         ItemSplitter.LOGGER.warn("Inside simulateStackSplit function");
 
-        if (client.player == null || client.interactionManager == null) return;
-
-        // Prevent click if already holding an item
-        if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
+        if (client.player == null || client.interactionManager == null) {
+            ItemSplitter.LOGGER.info("Null client or interaction manager");
+            return;
+        } else if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
             ItemSplitter.LOGGER.warn("Aborted: Player is already holding an item.");
             return;
         }
@@ -117,6 +130,8 @@ public abstract class HandledScreenMixin extends Screen {
 
             ItemSplitter.LOGGER.error("Click");
         }
+
+        ItemSplitter.LOGGER.info("Slot count: {}", screen.getScreenHandler().slots.size());
     }
 
     @Unique

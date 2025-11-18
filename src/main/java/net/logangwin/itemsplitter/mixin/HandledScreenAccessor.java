@@ -3,6 +3,7 @@ package net.logangwin.itemsplitter.mixin;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 
@@ -10,4 +11,10 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface HandledScreenAccessor {
     @Invoker("getSlotAt")
     Slot callGetSlotAt(double x, double y);
+
+    @Accessor("x")
+    int getX();
+
+    @Accessor("y")
+    int getY();
 }
