@@ -3,13 +3,14 @@ package net.logangwin.itemsplitter;
 import net.logangwin.itemsplitter.gui.Gui;
 import net.logangwin.itemsplitter.gui.ItemSplitScreen;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import org.lwjgl.glfw.GLFW;
+import net.minecraft.screen.slot.Slot;
 
 public class RightClickHandler
 {
     public static boolean isCharging = false;
-    public static long chargeStart = 0;
+    private static long chargeStart = 0;
+    public static Slot targetSlot = null;
+    public static boolean actionTriggered = false;
 
     public static void startCharging() {
         isCharging = true;
@@ -19,6 +20,10 @@ public class RightClickHandler
     public static void stopCharging() {
         isCharging = false;
         chargeStart = 0;
+    }
+
+    public static long getChargeTime() {
+        return chargeStart;
     }
 
     public static boolean checkIfReleasedEarly() {
@@ -39,7 +44,6 @@ public class RightClickHandler
                 stopCharging();
             }
         }
-
     }
 }
 
