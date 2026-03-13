@@ -37,28 +37,50 @@ public abstract class HandledScreenMixin extends Screen {
             RightClickHandler.targetSlot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
             RightClickHandler.actionTriggered = false;
             cir.setReturnValue(true);
+            cir.cancel();
         }
     }
 
-    @Inject(method = "mouseReleased", at = @At("HEAD"))
+    @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
     private void onMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
-            ItemSplitter.LOGGER.info("Released Right Click");
 
-            // Reset charge
+            // 1. If the long-press ALREADY triggered (in the tick/render method)
+            if (RightClickHandler.actionTriggered) {
+                ItemSplitter.LOGGER.info("Action already handled by timer, blocking vanilla release.");
+                RightClickHandler.stopCharging(); // Reset for next time
+                cir.setReturnValue(true);
+                cir.cancel();
+                return;
+            }
+
+            // 2. Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
 
-            // Simulate stack split if right click was released early
-            if (RightClickHandler.getChargeTime() > 0 && !RightClickHandler.actionTriggered) {
-                // If it wasn't released early, simulate logic
-                if (!releasedEarly) {
-                    simulateStackSplit((HandledScreen<?>) (Object) this, mouseX, mouseY);
+            // BLOCK VANILLA (because we manually sent the packet above)
+            if (!releasedEarly) {
+                // This is the 1-second + release trigger
+                ItemSplitter.LOGGER.info("Performing Custom Split");
+                simulateStackSplit((HandledScreen<?>) (Object) this, mouseX, mouseY);
+
+            }
+            else {
+                // 3. User released quickly - Perform Vanilla Right Click
+                ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
+                if (RightClickHandler.targetSlot != null) {
+                    this.onMouseClick(
+                            RightClickHandler.targetSlot,
+                            RightClickHandler.targetSlot.getIndex(),
+                            button,
+                            SlotActionType.PICKUP
+                    );
                 }
+
             }
-            else if (!RightClickHandler.actionTriggered) {
-                this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
-                RightClickHandler.stopCharging();
-            }
+
+            RightClickHandler.stopCharging();
+            cir.setReturnValue(true);
+            cir.cancel(); // BLOCK VANILLA
         }
     }
 
@@ -78,13 +100,6 @@ public abstract class HandledScreenMixin extends Screen {
         // Get the slot under the mouse and its id
         Slot slotUnderMouse = getSlotUnderMouse(screen, mouseX, mouseY);
         int slotId = getSlotIDUnderMouse(screen, mouseX, mouseY);
-
-        // Debug
-        if (slotUnderMouse != null) {
-            ItemSplitter.LOGGER.warn(String.valueOf(slotUnderMouse.x));
-            ItemSplitter.LOGGER.warn(String.valueOf(slotUnderMouse.y));
-            ItemSplitter.LOGGER.warn(String.valueOf(slotId));
-        }
 
         // Simulate a stack split
         if (slotUnderMouse != null && slotUnderMouse.hasStack()) {
