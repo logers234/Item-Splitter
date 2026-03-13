@@ -1,7 +1,5 @@
 package net.logangwin.itemsplitter;
 
-import net.logangwin.itemsplitter.gui.Gui;
-import net.logangwin.itemsplitter.gui.ItemSplitScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.screen.slot.Slot;
 
@@ -38,11 +36,9 @@ public class RightClickHandler
     public static void tick()
     {
         if (isCharging && System.currentTimeMillis() - chargeStart > 1000) {
+            // TODO: Add owo GUI here
             MinecraftClient client = MinecraftClient.getInstance();
-            if (!(client.currentScreen instanceof ItemSplitScreen)) {
-                client.setScreen(new ItemSplitScreen(new Gui()));
-                stopCharging();
-            }
+            stopCharging();
         }
     }
 }

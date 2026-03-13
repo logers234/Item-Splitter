@@ -47,8 +47,8 @@ public abstract class HandledScreenMixin extends Screen {
 
             // 1. If the long-press ALREADY triggered (in the tick/render method)
             if (RightClickHandler.actionTriggered) {
-                ItemSplitter.LOGGER.info("Action already handled by timer, blocking vanilla release.");
-                RightClickHandler.stopCharging(); // Reset for next time
+                // Cancel action if it has already been triggered, then reset
+                RightClickHandler.stopCharging();
                 cir.setReturnValue(true);
                 cir.cancel();
                 return;
@@ -57,9 +57,9 @@ public abstract class HandledScreenMixin extends Screen {
             // 2. Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
 
-            // BLOCK VANILLA (because we manually sent the packet above)
             if (!releasedEarly) {
-                // This is the 1-second + release trigger
+                // Right click hold passed 1 second threshold, do custom splitting logic here
+                // TODO: Implement custom tooltip UI and logic
                 ItemSplitter.LOGGER.info("Performing Custom Split");
                 simulateStackSplit((HandledScreen<?>) (Object) this, mouseX, mouseY);
 
@@ -68,19 +68,16 @@ public abstract class HandledScreenMixin extends Screen {
                 // 3. User released quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(
-                            RightClickHandler.targetSlot,
-                            RightClickHandler.targetSlot.getIndex(),
-                            button,
-                            SlotActionType.PICKUP
+                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP
                     );
                 }
 
             }
 
+            // Block vanilla action (we already manually sent the packet above)
             RightClickHandler.stopCharging();
             cir.setReturnValue(true);
-            cir.cancel(); // BLOCK VANILLA
+            cir.cancel();
         }
     }
 

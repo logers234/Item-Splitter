@@ -33,7 +33,7 @@
 		"minecraft": "~1.21.1",
 		"java": ">=21",
 		"fabric-api": "*",
-		"libgui": "*"
+		"owo-lib": "0.12.15.4+1.21"
 	},
 	"suggests": {
 		"another-mod": "*"
