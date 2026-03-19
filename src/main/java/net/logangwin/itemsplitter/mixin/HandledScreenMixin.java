@@ -1,9 +1,12 @@
 package net.logangwin.itemsplitter.mixin;
 
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.RightClickHandler;
+import net.logangwin.itemsplitter.gui.ChargeCircleComponent;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
@@ -14,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(HandledScreen.class)
@@ -24,6 +28,7 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Shadow protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
 
+    @SuppressWarnings("unused")
     public HandledScreenMixin() {
         super(null);
     }
@@ -45,7 +50,7 @@ public abstract class HandledScreenMixin extends Screen {
     private void onMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
 
-            // 1. If the long-press ALREADY triggered (in the tick/render method)
+            // If the long-press ALREADY triggered (in the tick/render method)
             if (RightClickHandler.actionTriggered) {
                 // Cancel action if it has already been triggered, then reset
                 RightClickHandler.stopCharging();
@@ -54,24 +59,23 @@ public abstract class HandledScreenMixin extends Screen {
                 return;
             }
 
-            // 2. Check if it's too early for the custom split
+            // Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
 
             if (!releasedEarly) {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
                 // TODO: Implement custom tooltip UI and logic
                 ItemSplitter.LOGGER.info("Performing Custom Split");
-                simulateStackSplit((HandledScreen<?>) (Object) this, mouseX, mouseY);
-
+                if (RightClickHandler.targetSlot != null) {
+                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
+                }
             }
             else {
-                // 3. User released quickly - Perform Vanilla Right Click
+                // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP
-                    );
+                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
                 }
-
             }
 
             // Block vanilla action (we already manually sent the packet above)
@@ -81,6 +85,7 @@ public abstract class HandledScreenMixin extends Screen {
         }
     }
 
+    @SuppressWarnings("unused")
     @Unique
     private void simulateStackSplit(HandledScreen<?> screen, double mouseX, double mouseY) {
         MinecraftClient client = MinecraftClient.getInstance();
@@ -145,5 +150,43 @@ public abstract class HandledScreenMixin extends Screen {
 
         // Return null if a slot wasn't found
         return null;
+    }
+
+    @Unique
+    private int getItemSlotX(Slot slot) {
+        return ((HandledScreenAccessor) this).getX() + slot.x + 8;
+    }
+
+    @Unique
+    private int getItemSlotY(Slot slot) {
+        return ((HandledScreenAccessor) this).getY() + slot.y + 8;
+    }
+
+    @Inject(method = "render", at = @At("TAIL"))
+    private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        if (RightClickHandler.isCharging() && RightClickHandler.targetSlot != null && RightClickHandler.getChargeTime() > 100 && RightClickHandler.targetSlot.hasStack()) {
+            // Get the charge percentage
+            float progress = RightClickHandler.getChargePercent();
+
+            // Push the charge circle to the front
+            context.getMatrices().push();
+            context.getMatrices().translate(0, 0, 500);
+
+            // Disable depth testing
+            RenderSystem.disableDepthTest();
+
+            // Get slot coordinates and draw the circle
+            int slotX = getItemSlotX(RightClickHandler.targetSlot);
+            int slotY = getItemSlotY(RightClickHandler.targetSlot);
+            ChargeCircleComponent.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
+
+            // Reset the offset and re-enable depth testing
+            RenderSystem.enableDepthTest();
+            context.getMatrices().pop();
+
+        } else {
+            // Hide when not splitting
+            ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
+        }
     }
 }

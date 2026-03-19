@@ -9,8 +9,8 @@
             </children>
 
             <positioning type="relative">
-                <x>50</x>
-                <y>50</y>
+                <x>25</x>
+                <y>25</y>
             </positioning>
         </flow-layout>
     </components>
