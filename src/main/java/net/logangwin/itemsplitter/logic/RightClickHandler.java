@@ -1,4 +1,4 @@
-package net.logangwin.itemsplitter;
+package net.logangwin.itemsplitter.logic;
 
 import net.minecraft.screen.slot.Slot;
 

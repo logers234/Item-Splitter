@@ -1,12 +1,13 @@
 {
-	"required": true,
-	"package": "net.logangwin.itemsplitter.mixin",
-	"compatibilityLevel": "JAVA_21",
-	"client": [
-		"HandledScreenAccessor",
-		"HandledScreenMixin"
-	],
-	"injectors": {
-		"defaultRequire": 1
+  "required": true,
+  "package": "net.logangwin.itemsplitter.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "HandledScreenAccessor",
+    "HandledScreenMixin",
+    "DrawContextInvoker"
+  ],
+  "injectors": {
+    "defaultRequire": 1
 	}
 }

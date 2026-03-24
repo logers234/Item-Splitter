@@ -3,8 +3,9 @@ package net.logangwin.itemsplitter.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitter;
-import net.logangwin.itemsplitter.RightClickHandler;
+import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleComponent;
+import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -168,22 +169,31 @@ public abstract class HandledScreenMixin extends Screen {
             // Get the charge percentage
             float progress = RightClickHandler.getChargePercent();
 
-            // Push the charge circle to the front
+            // Disable depth testing and push the charge circle to the front
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 500);
-
-            // Disable depth testing
             RenderSystem.disableDepthTest();
 
-            // Get slot coordinates and draw the circle
+            // Get slot coordinates and draw the circles
             int slotX = getItemSlotX(RightClickHandler.targetSlot);
             int slotY = getItemSlotY(RightClickHandler.targetSlot);
             ChargeCircleComponent.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
 
+            // Reset the offset
+            context.getMatrices().pop();
+
+            // ---- Render Split Screen Tooltip ----
+
+            // Disable depth testing and push the slider to the front
+            context.getMatrices().push();
+            context.getMatrices().translate(0, 0, 550);
+
+            // Draw tooltip
+            SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.targetSlot);
+
             // Reset the offset and re-enable depth testing
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
-
         } else {
             // Hide when not splitting
             ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);

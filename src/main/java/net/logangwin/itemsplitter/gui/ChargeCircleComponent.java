@@ -3,7 +3,7 @@ package net.logangwin.itemsplitter.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import io.wispforest.owo.ui.base.BaseComponent;
 import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.logangwin.itemsplitter.RightClickHandler;
+import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
