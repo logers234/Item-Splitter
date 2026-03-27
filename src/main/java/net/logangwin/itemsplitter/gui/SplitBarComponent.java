@@ -3,24 +3,8 @@ package net.logangwin.itemsplitter.gui;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import net.minecraft.screen.slot.Slot;
 
 public class SplitBarComponent implements TooltipComponent {
-
-    private int splitAmount;
-    private int itemCount;
-
-    public SplitBarComponent(Slot targetSlot) {
-        this.itemCount = targetSlot.getStack().getCount();
-        this.splitAmount = Math.round((float) itemCount / 2);
-    }
-
-    public void setSplit(int splitAmount) {
-        // Update split amount, do not accept negative numbers
-        if (splitAmount >= 0) {
-            this.splitAmount = splitAmount;
-        }
-    }
 
     @Override
     public int getHeight() {

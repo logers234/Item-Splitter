@@ -6,6 +6,7 @@ import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleComponent;
 import net.logangwin.itemsplitter.gui.SplitScreen;
+import net.logangwin.itemsplitter.logic.SplitScreenLogic;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -66,6 +67,9 @@ public abstract class HandledScreenMixin extends Screen {
             if (!releasedEarly) {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
                 // TODO: Implement custom tooltip UI and logic
+                SplitScreenLogic.onScreenOpen(RightClickHandler.targetSlot);
+                SplitScreenLogic.saveMouseCoordinates(this.x, this.y);
+
                 ItemSplitter.LOGGER.info("Performing Custom Split");
                 if (RightClickHandler.targetSlot != null) {
                     this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
@@ -180,13 +184,23 @@ public abstract class HandledScreenMixin extends Screen {
             ChargeCircleComponent.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
 
             // Reset the offset
+            RenderSystem.enableDepthTest();
             context.getMatrices().pop();
+        } else {
+            // Hide when not splitting
+            ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
+        }
 
+        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null) {
             // ---- Render Split Screen Tooltip ----
 
             // Disable depth testing and push the slider to the front
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 550);
+
+            // Get slot coordinates for tooltip
+            int slotX = getItemSlotX(RightClickHandler.targetSlot);
+            int slotY = getItemSlotY(RightClickHandler.targetSlot);
 
             // Draw tooltip
             SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.targetSlot);
@@ -194,9 +208,6 @@ public abstract class HandledScreenMixin extends Screen {
             // Reset the offset and re-enable depth testing
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
-        } else {
-            // Hide when not splitting
-            ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
         }
     }
 }
