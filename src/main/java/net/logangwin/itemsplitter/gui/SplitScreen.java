@@ -14,6 +14,7 @@ import java.util.List;
 public class SplitScreen {
     private static List<TooltipComponent> components;
     private static final TooltipPositioner positioner = HoveredTooltipPositioner.INSTANCE;
+    private static double progress = 0.5F;
 
     public static void initialize() {
         // Create space for slider to go
@@ -22,12 +23,25 @@ public class SplitScreen {
 
     public static void drawTooltip(DrawContext context, TextRenderer textRenderer, int slotX, int slotY, Slot targetSlot) {
             // Add split bar to the component list
-            components.add(new SplitBarComponent(targetSlot));
+            components.add(new SplitBarComponent(SplitScreen.progress));
 
             // Render the tooltip at that specific spot
             ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, slotX, slotY, positioner);
 
             // Clear the list
             components.clear();
+    }
+
+    public static void updateSplitSlider(double progress) {
+        // Ensure progress percentage is within bounds
+        if (progress > 1.0F) {
+            SplitScreen.progress = 1.0F;
+        }
+        else if (progress < 0.0F) {
+            SplitScreen.progress = 0.0F;
+        }
+        else {
+            SplitScreen.progress = progress;
+        }
     }
 }

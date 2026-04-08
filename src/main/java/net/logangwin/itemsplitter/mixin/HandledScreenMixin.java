@@ -17,6 +17,7 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
+import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -39,6 +40,7 @@ public abstract class HandledScreenMixin extends Screen {
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         // If the mouse button that was triggered was the right mouse button, block the vanilla behavior
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+
             // Start the timer, get the target slot and block the right click action
             RightClickHandler.startCharging();
             RightClickHandler.targetSlot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
@@ -68,7 +70,7 @@ public abstract class HandledScreenMixin extends Screen {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
                 // TODO: Implement custom tooltip UI and logic
                 SplitScreenLogic.onScreenOpen(RightClickHandler.targetSlot);
-                SplitScreenLogic.saveMouseCoordinates(this.x, this.y);
+                SplitScreenLogic.saveMouseCoordinates(mouseX, mouseY);
 
                 ItemSplitter.LOGGER.info("Performing Custom Split");
                 if (RightClickHandler.targetSlot != null) {
@@ -193,6 +195,7 @@ public abstract class HandledScreenMixin extends Screen {
 
         if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null) {
             // ---- Render Split Screen Tooltip ----
+            SplitScreenLogic.updateSplitSlider();
 
             // Disable depth testing and push the slider to the front
             context.getMatrices().push();
