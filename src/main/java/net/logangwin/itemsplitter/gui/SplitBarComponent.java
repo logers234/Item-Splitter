@@ -32,8 +32,11 @@ public class SplitBarComponent implements TooltipComponent {
         // Background
         context.fill(x, y + 2, x + width, y + 2 + height, 0xFF292929);
 
-        // Calculate segments
-        int progressWidth = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
+        // Calculate how many items are being split
+        int currentItems = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
+
+        // Calculate width based on the ratio of items
+        int progressWidth = (currentItems * width) / SplitScreenLogic.getMaxSplit();
 
         // Draw bar
         context.fill(x, y + 2, x + progressWidth, y + 2 + height, 0xFFFFFFFF);

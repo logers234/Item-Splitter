@@ -160,7 +160,7 @@ public abstract class HandledScreenMixin extends Screen {
     }
 
     @Unique
-    private int getItemSlotX(Slot slot) {
+    public int getItemSlotX(Slot slot) {
         return ((HandledScreenAccessor) this).getX() + slot.x + 8;
     }
 

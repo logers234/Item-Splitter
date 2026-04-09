@@ -63,55 +63,34 @@ public class SplitScreenLogic {
         // Get client
         MinecraftClient client = MinecraftClient.getInstance();
 
-        // Calculate the difference between the mouseX
-        // when screen was created and current mouseX
-        double deltaX = mouseX - (client.mouse.getX() / client.getWindow().getScaleFactor());
-
         // Get current screen
         HandledScreen<?> currentScreen = getCurrentScreen();
         HandledScreenAccessor accessor = (HandledScreenAccessor) currentScreen;
 
         // Get the left and right edge of inventory
-        if (accessor != null) {
-            // Upper and lower bound
-            int width = accessor.getBackgroundWidth();
-            double upperBound = (double) width / 2;
-            double lowerBound = (double) (width * -1) / 2;
-            double offset;
-            double ratio;
+        if (accessor != null && RightClickHandler.targetSlot != null) {
 
-            if (deltaX > 0) {
-                // If offset greater than upperBound, cap to upperBound
-                offset = Math.min(deltaX, upperBound);
+            double ratio = getRatio((HandledScreenAccessor) currentScreen, client, accessor);
 
-                // Calculate how far into the upper bound the offset is
-                ratio = offset / upperBound;
-
-                // Since offset is in the upper half, multiply by half and add half
-                ratio *= 0.5F;
-                ratio += 0.5F;
-
-                // Update split slider
-                SplitScreen.updateSplitSlider(ratio);
-            }
-            else if (deltaX < 0) {
-                // If offset less than lowerBound, cap to lowerBound
-                offset = Math.max(deltaX, lowerBound);
-
-                // Calculate how far into the lower bound the offset is
-                ratio = offset / lowerBound;
-                ratio = 1.0F - ratio;
-                ratio *= 0.5F;
-
-                // Update split slider
-                SplitScreen.updateSplitSlider(ratio);
-            }
-            else {
-                // If the offset is 0, then the slider should be at half
-                SplitScreen.updateSplitSlider(0.5F);
-            }
-
+            SplitScreen.updateSplitSlider((float) ratio);
         }
+    }
+
+    private static double getRatio(HandledScreenAccessor currentScreen, MinecraftClient client, HandledScreenAccessor accessor) {
+        // Calculate delta between target slot and mouse
+        int guiLeft = currentScreen.getX();
+        int slotX = guiLeft + RightClickHandler.targetSlot.x + 8;
+        double deltaX = (client.mouse.getX() / client.getWindow().getScaleFactor()) - (double) slotX;
+
+        // Calculate bounds
+        int width = accessor.getBackgroundWidth() / 4;
+        double halfWidth = width / 2.0;
+
+        // Clamp deltaX between -halfWidth and +halfWidth
+        double offset = Math.max(-halfWidth, Math.min(deltaX, halfWidth));
+
+        // Ratio from 0.0 to 1.0
+        return (offset / (double) width) + 0.5;
     }
 
     public static HandledScreen<?> getCurrentScreen() {
