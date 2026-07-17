@@ -85,6 +85,12 @@ public abstract class HandledScreenMixin extends Screen {
                 }
             }
 
+            // Split screen should close if it was open
+            if (SplitScreenLogic.isScreenOpen()) {
+                ItemSplitter.LOGGER.info("Closing screen");
+                SplitScreenLogic.onScreenClose();
+            }
+
             // Block vanilla action (we already manually sent the packet above)
             RightClickHandler.stopCharging();
             cir.setReturnValue(true);
@@ -92,32 +98,12 @@ public abstract class HandledScreenMixin extends Screen {
         }
     }
 
-    @SuppressWarnings("unused")
-    @Unique
-    private void simulateStackSplit(HandledScreen<?> screen, double mouseX, double mouseY) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        ItemSplitter.LOGGER.warn("Inside simulateStackSplit function");
-
-        if (client.player == null || client.interactionManager == null) {
-            ItemSplitter.LOGGER.info("Null client or interaction manager");
-            return;
-        } else if (!client.player.currentScreenHandler.getCursorStack().isEmpty()) {
-            ItemSplitter.LOGGER.warn("Aborted: Player is already holding an item.");
-            return;
+    @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
+    private void hideTooltipWhenCharging(DrawContext context, int x, int y, CallbackInfo ci) {
+        // If right click is charging or the split screen is open, hide the current tooltip
+        if (RightClickHandler.isCharging() || SplitScreenLogic.isScreenOpen()) {
+            ci.cancel();
         }
-
-        // Get the slot under the mouse and its id
-        Slot slotUnderMouse = getSlotUnderMouse(screen, mouseX, mouseY);
-        int slotId = getSlotIDUnderMouse(screen, mouseX, mouseY);
-
-        // Simulate a stack split
-        if (slotUnderMouse != null && slotUnderMouse.hasStack()) {
-            client.interactionManager.clickSlot(screen.getScreenHandler().syncId, slotId, 1, SlotActionType.PICKUP, client.player);
-
-            ItemSplitter.LOGGER.error("Click");
-        }
-
-        ItemSplitter.LOGGER.info("Slot count: {}", screen.getScreenHandler().slots.size());
     }
 
     @Unique
@@ -193,7 +179,7 @@ public abstract class HandledScreenMixin extends Screen {
             ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
         }
 
-        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null) {
+        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null && RightClickHandler.targetSlot.getStack().getCount() > 0) {
             // ---- Render Split Screen Tooltip ----
             SplitScreenLogic.updateSplitSlider();
 

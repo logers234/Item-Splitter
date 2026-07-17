@@ -23,7 +23,14 @@ public class SplitScreen {
 
     public static void drawTooltip(DrawContext context, TextRenderer textRenderer, int slotX, int slotY, Slot targetSlot) {
             // Add split bar to the component list
-            components.add(new SplitBarComponent(SplitScreen.progress));
+            components.add(new SplitBarComponent(SplitScreen.progress, textRenderer));
+
+            // Cancel out tooltip offsets
+            slotX -= 12;
+
+            // Center screen above target slot
+            slotX -= (components.getFirst().getWidth(textRenderer) / 2);
+            slotY -= 10;
 
             // Render the tooltip at that specific spot
             ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, slotX, slotY, positioner);

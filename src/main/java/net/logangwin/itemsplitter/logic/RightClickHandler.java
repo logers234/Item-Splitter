@@ -28,7 +28,7 @@ public class RightClickHandler
     }
 
     public static boolean isCharging() {
-        // Is right click being held?
+        // Is the right click being held?
         return isCharging;
     }
 
@@ -51,7 +51,13 @@ public class RightClickHandler
     public static void tick()
     {
         if (isCharging && System.currentTimeMillis() - chargeStart > maxCharge) {
-            // TODO: Add owo GUI here
+            // If the charge threshold is reached, open the split screen
+            try {
+                SplitScreenLogic.onScreenOpen(targetSlot);
+            } catch (Exception e) {
+                throw new NullPointerException("Target slot is null");
+            }
+
             stopCharging();
         }
     }
