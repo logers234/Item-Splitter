@@ -7,6 +7,7 @@ public class RightClickHandler
     private static boolean isCharging = false;
     private static long chargeStart = 0;
     public static Slot targetSlot = null;
+    public static int targetSlotID = -1;
     public static boolean actionTriggered = false;
     public static int maxCharge = 1000;
 

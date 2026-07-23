@@ -13,7 +13,7 @@ public class SplitBarComponent implements TooltipComponent {
     private final int height = 2;
     private final int heightPadding = 5;
     private final int barWidth = 50;
-    private final int barPadding = 3;
+    private final int barPadding = 4;
     private final float textScale = 0.75F;
     private final int maxTextWidth;
 

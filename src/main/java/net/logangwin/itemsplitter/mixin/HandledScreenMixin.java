@@ -44,6 +44,7 @@ public abstract class HandledScreenMixin extends Screen {
             // Start the timer, get the target slot and block the right click action
             RightClickHandler.startCharging();
             RightClickHandler.targetSlot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
+            RightClickHandler.targetSlotID = this.getSlotIDUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
             RightClickHandler.actionTriggered = false;
             cir.setReturnValue(true);
             cir.cancel();
@@ -69,12 +70,10 @@ public abstract class HandledScreenMixin extends Screen {
             if (!releasedEarly) {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
                 // TODO: Implement custom tooltip UI and logic
-                SplitScreenLogic.onScreenOpen(RightClickHandler.targetSlot);
-                SplitScreenLogic.saveMouseCoordinates(mouseX, mouseY);
 
-                ItemSplitter.LOGGER.info("Performing Custom Split");
                 if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
+                    ItemSplitter.LOGGER.info("Performing Custom Split");
+                    SplitScreenLogic.splitStack(RightClickHandler.targetSlot);
                 }
             }
             else {
@@ -89,6 +88,8 @@ public abstract class HandledScreenMixin extends Screen {
             if (SplitScreenLogic.isScreenOpen()) {
                 ItemSplitter.LOGGER.info("Closing screen");
                 SplitScreenLogic.onScreenClose();
+                RightClickHandler.targetSlot = null;
+                RightClickHandler.targetSlotID = -1;
             }
 
             // Block vanilla action (we already manually sent the packet above)

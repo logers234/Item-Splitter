@@ -1,10 +1,13 @@
 package net.logangwin.itemsplitter.logic;
 
+import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.mixin.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
+import org.lwjgl.glfw.GLFW;
 
 public class SplitScreenLogic {
 
@@ -72,7 +75,9 @@ public class SplitScreenLogic {
 
             double ratio = getRatio((HandledScreenAccessor) currentScreen, client, accessor);
 
-            SplitScreen.updateSplitSlider((float) ratio);
+            // Update the slider and the current number of items to be picked up
+            SplitScreen.updateSplitSlider(ratio);
+            setSplitAmount(Math.round((float) (maxSplit * ratio)));
         }
     }
 
@@ -102,5 +107,103 @@ public class SplitScreenLogic {
         }
 
         return null; // No inventory is currently open
+    }
+
+    public static void splitStack(Slot targetSlot) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        HandledScreen<?> screen = getCurrentScreen();
+
+        if (screen == null || client.interactionManager == null || targetSlot == null) return;
+
+        int slotId = RightClickHandler.targetSlotID;
+        int syncId = screen.getScreenHandler().syncId;
+        int itemsInStack = targetSlot.getStack().getCount();
+        int halfStack = (int) Math.ceil((double) itemsInStack / 2);
+
+        ItemSplitter.LOGGER.info("Slot ID = {}", slotId);
+        // Safety checks
+        if (splitAmount <= 0 || splitAmount > itemsInStack) return;
+
+        // Case 1: Grab the full stack
+        if (splitAmount == itemsInStack) {
+            client.interactionManager.clickSlot(
+                    screen.getScreenHandler().syncId,
+                    slotId,
+                    GLFW.GLFW_MOUSE_BUTTON_LEFT,
+                    SlotActionType.PICKUP,
+                    client.player
+            );
+            return;
+        }
+
+        // Case 2: Grab exactly half (Vanilla default behavior)
+        if (splitAmount == halfStack) {
+            client.interactionManager.clickSlot(
+                    screen.getScreenHandler().syncId,
+                    slotId,
+                    GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+                    SlotActionType.PICKUP,
+                    client.player
+            );
+            return;
+        }
+
+        // Case 3: Number of items left behind is greater than the number picked up
+        if (splitAmount > halfStack) {
+            // Pickup half of the stack
+            client.interactionManager.clickSlot(
+                    screen.getScreenHandler().syncId,
+                    slotId,
+                    GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+                    SlotActionType.PICKUP,
+                    client.player
+            );
+
+            // Calculate the number of items to drop back into stack
+            int dropItems = splitAmount - halfStack;
+
+            ItemSplitter.LOGGER.info("itemsToDropBack = {}", dropItems);
+
+            // Queue the clicks
+            for (int i = 0; i < dropItems; i++) {
+                if (!screen.getScreenHandler().getCursorStack().isEmpty()) {
+                    client.interactionManager.clickSlot(
+                            screen.getScreenHandler().syncId,
+                            slotId,
+                            GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+                            SlotActionType.PICKUP,
+                            client.player
+                    );
+                }
+                else {
+                    ItemSplitter.LOGGER.warn("Cursor is empty!");
+                }
+            }
+        }
+        // Case 4: Number of items picked up is greater than those left behind
+        else {
+            // Pickup the stack
+            client.interactionManager.clickSlot(
+                    screen.getScreenHandler().syncId,
+                    slotId,
+                    GLFW.GLFW_MOUSE_BUTTON_LEFT,
+                    SlotActionType.PICKUP,
+                    client.player
+            );
+
+            // Calculate the number of items to drop back into the inventory
+            int dropItems = itemsInStack - splitAmount;
+
+            // Queue the actions
+            for (int i = 0; i < dropItems; i++) {
+                client.interactionManager.clickSlot(
+                        screen.getScreenHandler().syncId,
+                        slotId,
+                        GLFW.GLFW_MOUSE_BUTTON_RIGHT,
+                        SlotActionType.PICKUP,
+                        client.player
+                );
+            }
+        }
     }
 }
