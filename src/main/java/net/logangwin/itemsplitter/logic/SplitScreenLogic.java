@@ -47,7 +47,8 @@ public class SplitScreenLogic {
     public static int getMaxSplit() {
         return maxSplit;
     }
-    public static void setSplitAmount(int itemCount) {
+
+    private static void setSplitAmount(int itemCount) {
         if (itemCount >= minSplit || itemCount <= maxSplit) {
             splitAmount = itemCount;
         }
@@ -116,11 +117,10 @@ public class SplitScreenLogic {
         if (screen == null || client.interactionManager == null || targetSlot == null) return;
 
         int slotId = RightClickHandler.targetSlotID;
-        int syncId = screen.getScreenHandler().syncId;
         int itemsInStack = targetSlot.getStack().getCount();
         int halfStack = (int) Math.ceil((double) itemsInStack / 2);
 
-        ItemSplitter.LOGGER.info("Slot ID = {}", slotId);
+        ItemSplitter.LOGGER.info("Split amount = {}", splitAmount);
         // Safety checks
         if (splitAmount <= 0 || splitAmount > itemsInStack) return;
 
@@ -149,7 +149,7 @@ public class SplitScreenLogic {
         }
 
         // Case 3: Number of items left behind is greater than the number picked up
-        if (splitAmount > halfStack) {
+        if (splitAmount < halfStack) {
             // Pickup half of the stack
             client.interactionManager.clickSlot(
                     screen.getScreenHandler().syncId,
@@ -160,7 +160,7 @@ public class SplitScreenLogic {
             );
 
             // Calculate the number of items to drop back into stack
-            int dropItems = splitAmount - halfStack;
+            int dropItems = halfStack - splitAmount;
 
             ItemSplitter.LOGGER.info("itemsToDropBack = {}", dropItems);
 
