@@ -5,6 +5,8 @@ import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.mixin.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
@@ -111,17 +113,38 @@ public class SplitScreenLogic {
     }
 
     public static void splitStack(Slot targetSlot) {
+        // Get client and handled screen
         MinecraftClient client = MinecraftClient.getInstance();
         HandledScreen<?> screen = getCurrentScreen();
 
-        if (screen == null || client.interactionManager == null || targetSlot == null) return;
+        // Safety checks
+        if (screen == null || client.interactionManager == null || targetSlot == null || client.player == null) return;
 
-        int slotId = RightClickHandler.targetSlotID;
         int itemsInStack = targetSlot.getStack().getCount();
+        int slotId = RightClickHandler.targetSlotID;
+
+        // Use a different splitting process if player is in creative and within their own inventory
+        if (client.player.isCreative() && screen.getScreenHandler().syncId == 0) {
+
+            // Create copies of the cursor and leftover stacks
+            ItemStack stack = targetSlot.getStack().copyWithCount(splitAmount);
+            ItemStack remainingStack = targetSlot.getStack().copyWithCount(itemsInStack - splitAmount);
+
+            // Set cursor locally
+            screen.getScreenHandler().setCursorStack(stack);
+
+            // Update slot locally
+            targetSlot.setStack(remainingStack);
+
+            // Update the target slot leftover quantity
+            client.interactionManager.clickCreativeStack(remainingStack, slotId);
+
+            return;
+        }
+
         int halfStack = (int) Math.ceil((double) itemsInStack / 2);
 
-        ItemSplitter.LOGGER.info("Split amount = {}", splitAmount);
-        // Safety checks
+        // Ensure split amount is not out of bounds
         if (splitAmount <= 0 || splitAmount > itemsInStack) return;
 
         // Case 1: Grab the full stack
@@ -161,8 +184,6 @@ public class SplitScreenLogic {
 
             // Calculate the number of items to drop back into stack
             int dropItems = halfStack - splitAmount;
-
-            ItemSplitter.LOGGER.info("itemsToDropBack = {}", dropItems);
 
             // Queue the clicks
             for (int i = 0; i < dropItems; i++) {
