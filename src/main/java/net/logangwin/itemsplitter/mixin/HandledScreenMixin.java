@@ -3,6 +3,7 @@ package net.logangwin.itemsplitter.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleComponent;
 import net.logangwin.itemsplitter.gui.SplitScreen;
@@ -39,7 +40,7 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         // If the mouse button that was triggered was the right mouse button, block the vanilla behavior
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && client != null && client.player != null) {
 
             // Start the timer, get the target slot and block the right click action
             RightClickHandler.startCharging();
@@ -53,7 +54,7 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
     private void onMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && client != null && client.player != null) {
 
             // If the long-press ALREADY triggered (in the tick/render method)
             if (RightClickHandler.actionTriggered) {
@@ -67,12 +68,17 @@ public abstract class HandledScreenMixin extends Screen {
             // Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
 
-            if (!releasedEarly) {
+            if (!releasedEarly && RightClickHandler.targetSlot != null) {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
-                // TODO: Implement custom tooltip UI and logic
 
-                if (RightClickHandler.targetSlot != null) {
-                    ItemSplitter.LOGGER.info("Performing Custom Split");
+                boolean creativeSlot = ItemSplitterUtils.isCreativeSlot((HandledScreen<?>) (Object) this, RightClickHandler.targetSlot);
+
+                if (client.player.isCreative() && creativeSlot) {
+                    ItemSplitter.LOGGER.info("Performing Creative Pickup Operation");
+                    SplitScreenLogic.creativePickupStack(RightClickHandler.targetSlot);
+                }
+                else {
+                    ItemSplitter.LOGGER.info("Performing Standard Custom Split");
                     SplitScreenLogic.splitStack(RightClickHandler.targetSlot);
                 }
             }

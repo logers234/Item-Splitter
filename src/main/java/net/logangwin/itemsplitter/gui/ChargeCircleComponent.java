@@ -8,6 +8,8 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
 
+// TODO: Refactor Charge Circle to not use owo UI
+
 public class ChargeCircleComponent extends BaseComponent {
     protected float progress = 0f; // 0.0 to 1.0
 

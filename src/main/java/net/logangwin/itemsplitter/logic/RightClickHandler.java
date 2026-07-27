@@ -1,5 +1,6 @@
 package net.logangwin.itemsplitter.logic;
 
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 
 public class RightClickHandler
@@ -52,6 +53,7 @@ public class RightClickHandler
     public static void tick()
     {
         if (isCharging && System.currentTimeMillis() - chargeStart > maxCharge) {
+
             // If the charge threshold is reached, open the split screen
             try {
                 SplitScreenLogic.onScreenOpen(targetSlot);

@@ -1,10 +1,13 @@
 package net.logangwin.itemsplitter.gui;
 
 import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
@@ -24,10 +27,20 @@ public class SplitScreen {
     }
 
     public static void drawTooltip(DrawContext context, TextRenderer textRenderer, int slotX, int slotY, Slot targetSlot) {
-            // Add split bar to the component list
-            int stackSize = RightClickHandler.targetSlot.getStack().getCount();
-            components.add(new SplitBarComponent(textRenderer, SplitScreen.progress, stackSize));
 
+            boolean creativeSlot = ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), RightClickHandler.targetSlot);
+            MinecraftClient client = MinecraftClient.getInstance();
+            assert client.player != null;
+
+            if (client.player.isCreative() && creativeSlot) {
+                // Add creative mode split bar to the component list
+                components.add(new CreativeSplitBarComponent(textRenderer, progress));
+            }
+            else {
+                // Add standard split bar to the component list
+                int stackSize = RightClickHandler.targetSlot.getStack().getCount();
+                components.add(new SplitBarComponent(textRenderer, SplitScreen.progress, stackSize));
+            }
             // Cancel out tooltip offsets
             slotX -= 12;
 

@@ -5,7 +5,6 @@ import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.mixin.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -68,10 +67,14 @@ public class SplitScreenLogic {
     public static void updateSplitSlider() {
         // Get client
         MinecraftClient client = MinecraftClient.getInstance();
+        assert client.player != null;
 
         // Get current screen
-        HandledScreen<?> currentScreen = getCurrentScreen();
+        HandledScreen<?> currentScreen = ItemSplitterUtils.getCurrentScreen();
         HandledScreenAccessor accessor = (HandledScreenAccessor) currentScreen;
+
+        // Check if the target slot is part of the creative grid
+        boolean creativeSlot = ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), RightClickHandler.targetSlot);
 
         // Get the left and right edge of inventory
         if (accessor != null && RightClickHandler.targetSlot != null) {
@@ -80,7 +83,12 @@ public class SplitScreenLogic {
 
             // Update the slider and the current number of items to be picked up
             SplitScreen.updateSplitSlider(ratio);
-            setSplitAmount(Math.round((float) (maxSplit * ratio)));
+            if (client.player.isCreative() && creativeSlot) {
+                setSplitAmount(Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * ratio)));
+            }
+            else {
+                setSplitAmount(Math.round((float) (maxSplit * ratio)));
+            }
         }
     }
 
@@ -101,21 +109,10 @@ public class SplitScreenLogic {
         return (offset / (double) width) + 0.5;
     }
 
-    public static HandledScreen<?> getCurrentScreen() {
-        MinecraftClient client = MinecraftClient.getInstance();
-
-        // Check if the current screen is an instance of HandledScreen
-        if (client.currentScreen instanceof HandledScreen<?> handledScreen) {
-            return handledScreen;
-        }
-
-        return null; // No inventory is currently open
-    }
-
     public static void splitStack(Slot targetSlot) {
         // Get client and handled screen
         MinecraftClient client = MinecraftClient.getInstance();
-        HandledScreen<?> screen = getCurrentScreen();
+        HandledScreen<?> screen = ItemSplitterUtils.getCurrentScreen();
 
         // Safety checks
         if (screen == null || client.interactionManager == null || targetSlot == null || client.player == null) return;
@@ -225,6 +222,25 @@ public class SplitScreenLogic {
                         client.player
                 );
             }
+        }
+    }
+
+    public static void creativePickupStack(Slot targetSlot) {
+        // Get client and handled screen
+        MinecraftClient client = MinecraftClient.getInstance();
+        HandledScreen<?> screen = ItemSplitterUtils.getCurrentScreen();
+
+        // Safety checks
+        if (screen == null || client.interactionManager == null || targetSlot == null || client.player == null) return;
+
+        // Use a different splitting process if player is in creative and within their own inventory
+        if (client.player.isCreative() && screen.getScreenHandler().syncId == 0) {
+
+            // Create cursor stack
+            ItemStack stack = targetSlot.getStack().copyWithCount(splitAmount);
+
+            // Set cursor locally
+            screen.getScreenHandler().setCursorStack(stack);
         }
     }
 }

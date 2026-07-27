@@ -10,6 +10,8 @@ import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.Identifier;
 
+// TODO: Refactor Charge Circle to not use owo UI
+
 public class ChargeHud {
     private static ChargeCircleComponent circle;
     private static FlowLayout container;

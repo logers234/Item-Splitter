@@ -75,7 +75,6 @@ public class SplitBarComponent implements TooltipComponent {
         drawSplitText(textRenderer, context, rightText, rightTextX, y);
     }
 
-    @Unique
     private void drawSplitBar(DrawContext context, TextRenderer textRenderer, int x, int y) {
         // Values
         int thumbWidth = 2;
@@ -104,7 +103,6 @@ public class SplitBarComponent implements TooltipComponent {
                     0xFFFFFFFF);
     }
 
-    @Unique
     private void drawSplitText(TextRenderer textRenderer, DrawContext context, String text, int textX, int textY) {
         // Push the stack
         context.getMatrices().push();

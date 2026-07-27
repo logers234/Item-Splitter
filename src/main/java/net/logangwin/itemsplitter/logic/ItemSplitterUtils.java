@@ -1,5 +1,6 @@
 package net.logangwin.itemsplitter.logic;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.entity.player.PlayerInventory;
@@ -25,5 +26,16 @@ public class ItemSplitterUtils {
         }
 
         return false;
+    }
+
+    public static HandledScreen<?> getCurrentScreen() {
+        MinecraftClient client = MinecraftClient.getInstance();
+
+        // Check if the current screen is an instance of HandledScreen
+        if (client.currentScreen instanceof HandledScreen<?> handledScreen) {
+            return handledScreen;
+        }
+
+        return null; // No inventory is currently open
     }
 }
