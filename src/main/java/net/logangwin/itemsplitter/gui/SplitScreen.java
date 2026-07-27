@@ -1,5 +1,7 @@
 package net.logangwin.itemsplitter.gui;
 
+import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -23,7 +25,8 @@ public class SplitScreen {
 
     public static void drawTooltip(DrawContext context, TextRenderer textRenderer, int slotX, int slotY, Slot targetSlot) {
             // Add split bar to the component list
-            components.add(new SplitBarComponent(SplitScreen.progress, textRenderer));
+            int stackSize = RightClickHandler.targetSlot.getStack().getCount();
+            components.add(new SplitBarComponent(textRenderer, SplitScreen.progress, stackSize));
 
             // Cancel out tooltip offsets
             slotX -= 12;
