@@ -1,7 +1,6 @@
 package net.logangwin.itemsplitter.gui;
 
 import net.logangwin.itemsplitter.logic.RightClickHandler;
-import net.logangwin.itemsplitter.logic.SplitScreenLogic;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -19,21 +18,25 @@ public class CreativeSplitBarComponent implements TooltipComponent {
     private final int thumbHeight = 4;
     private final int thumbPadding = 2;
     private final int textHeight;
+    private final int maxTextWidth;
 
-    CreativeSplitBarComponent(TextRenderer textRenderer, double progress) {
+    CreativeSplitBarComponent(TextRenderer textRenderer, double progress, int maxCount) {
         this.progress = progress;
         this.textHeight = (int) (textRenderer.fontHeight * textScale);
 
         // Calculate total tooltip width
         this.width = this.barWidth + (this.barPadding * 2);
 
-        // Calculate total tooltip barHeight
-        this.height = barHeight + heightPadding + thumbPadding + textHeight;
+        // Calculate total tooltip height
+        this.height = barHeight + thumbPadding + textHeight;
+
+        // Calculate max text width
+        this.maxTextWidth = (int) (textRenderer.getWidth(String.valueOf(maxCount)) * textScale);
     }
 
     @Override
     public int getHeight() {
-        return height;
+        return height + heightPadding;
     }
 
     @Override
@@ -53,8 +56,9 @@ public class CreativeSplitBarComponent implements TooltipComponent {
         drawSplitBar(context, textRenderer, x, y);
 
         // Calculate text positions
-        int textX = x + progressWidth + (textWidth / 2);
-        int textY = y - (thumbHeight / 2) - thumbPadding - textHeight;
+        int textAnchor = x + progressWidth + barPadding;
+        int textX = textAnchor - (textWidth / 2);
+        int textY = y + height - (thumbHeight / 2) - thumbPadding - textHeight;
 
         // Draw text
         drawPickupText(textRenderer, context, text, textX, textY);
@@ -68,23 +72,26 @@ public class CreativeSplitBarComponent implements TooltipComponent {
         int offset = (int) Math.floor(heightPadding / 2.0F);
         int center = (int) Math.floor(this.getWidth(textRenderer) / 2.0F);
         int barX = x + center - (barWidth / 2);
+        int barY = y + height;
 
         // Background
-        context.fill(barX, y + offset, barX + barWidth, y + offset + barHeight, 0xFF292929);
+        context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF292929);
 
         // Calculate the width of split bar based on how many items are being split
         int currentItems = Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * progress));
         int progressWidth = (currentItems * barWidth) / RightClickHandler.targetSlot.getStack().getMaxCount();
 
         // Draw split bar
-        context.fill(barX, y + offset, barX + progressWidth, y + offset + barHeight, 0xFFFFFFFF);
+        context.fill(barX, barY, barX + progressWidth, barY + barHeight, 0xFFFFFFFF);
 
         // Draw split bar thumb
-        context.fill(barX + progressWidth - (thumbWidth / 2),
-                y + offset + (barHeight / 2) + (thumbHeight / 2),
+        context.fill(
+                barX + progressWidth - (thumbWidth / 2),
+                barY + (barHeight / 2) + (thumbHeight / 2),
                 barX + progressWidth + (thumbWidth / 2),
-                y + offset + (barHeight / 2) - (thumbHeight / 2),
-                0xFFFFFFFF);
+                barY + (barHeight / 2) - (thumbHeight / 2),
+                0xFFFFFFFF
+        );
     }
 
     private void drawPickupText(TextRenderer textRenderer, DrawContext context, String text, int textX, int textY) {

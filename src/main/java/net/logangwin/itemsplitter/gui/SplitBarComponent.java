@@ -96,11 +96,13 @@ public class SplitBarComponent implements TooltipComponent {
         context.fill(barX, y + offset, barX + progressWidth, y + offset + height, 0xFFFFFFFF);
 
         // Draw split bar thumb
-        context.fill(barX + progressWidth - (thumbWidth / 2),
-                     y + offset + (height / 2) + (thumbHeight / 2),
-                     barX + progressWidth + (thumbWidth / 2),
-                     y + offset + (height / 2) - (thumbHeight / 2),
-                    0xFFFFFFFF);
+        context.fill(
+                barX + progressWidth - (thumbWidth / 2),
+                y + offset + (height / 2) + (thumbHeight / 2),
+                barX + progressWidth + (thumbWidth / 2),
+                y + offset + (height / 2) - (thumbHeight / 2),
+                0xFFFFFFFF
+        );
     }
 
     private void drawSplitText(TextRenderer textRenderer, DrawContext context, String text, int textX, int textY) {
