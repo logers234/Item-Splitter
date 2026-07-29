@@ -5,10 +5,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
-import net.logangwin.itemsplitter.gui.ChargeCircleComponent;
+import net.logangwin.itemsplitter.gui.ChargeCircleHud;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.logic.SplitScreenLogic;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -18,7 +17,6 @@ import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -176,14 +174,14 @@ public abstract class HandledScreenMixin extends Screen {
             // Get slot coordinates and draw the circles
             int slotX = getItemSlotX(RightClickHandler.targetSlot);
             int slotY = getItemSlotY(RightClickHandler.targetSlot);
-            ChargeCircleComponent.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
+            ChargeCircleHud.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
 
             // Reset the offset
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
         } else {
             // Hide when not splitting
-            ChargeCircleComponent.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
+            ChargeCircleHud.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
         }
 
         if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null && RightClickHandler.targetSlot.getStack().getCount() > 0) {

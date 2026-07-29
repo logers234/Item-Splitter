@@ -1,34 +1,11 @@
 package net.logangwin.itemsplitter.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import io.wispforest.owo.ui.base.BaseComponent;
-import io.wispforest.owo.ui.core.OwoUIDrawContext;
-import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import org.joml.Matrix4f;
 
-// TODO: Refactor Charge Circle to not use owo UI
-
-public class ChargeCircleComponent extends BaseComponent {
-    protected float progress = 0f; // 0.0 to 1.0
-
-    public void setProgress(float progress) {
-        this.progress = Math.max(0, Math.min(1, progress));
-    }
-
-    @Override
-    public void draw(OwoUIDrawContext context, int mouseX, int mouseY, float partialTicks, float delta) {
-        // Center of the component
-        int centerX = this.x + this.width / 2;
-        int centerY = this.y + this.height / 2;
-
-        if (RightClickHandler.isCharging()) {
-            drawProgressRing(context, centerX, centerY, 4, 2, this.progress, 0xFFFFFFFF);
-        } else {
-            drawProgressRing(context, centerX, centerY, 4, 2, this.progress, 0X00000000);
-        }
-    }
+public class ChargeCircleHud {
 
     public static void drawProgressRing(DrawContext context, int x, int y, float radius, float thickness, float progress, int color) {
         if (progress <= 0) return;
