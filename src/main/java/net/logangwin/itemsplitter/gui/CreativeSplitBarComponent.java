@@ -69,7 +69,6 @@ public class CreativeSplitBarComponent implements TooltipComponent {
         int thumbWidth = 2;
 
         // Calculate offsets
-        int offset = (int) Math.floor(heightPadding / 2.0F);
         int center = (int) Math.floor(this.getWidth(textRenderer) / 2.0F);
         int barX = x + center - (barWidth / 2);
         int barY = y + height;

@@ -3,10 +3,16 @@ package net.logangwin.itemsplitter.logic;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.CreativeInventoryScreen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.texture.NativeImage;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
+import net.minecraft.resource.Resource;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.Identifier;
+
+import java.io.InputStream;
+import java.util.Optional;
 
 public class ItemSplitterUtils {
 
@@ -37,5 +43,39 @@ public class ItemSplitterUtils {
         }
 
         return null; // No inventory is currently open
+    }
+
+    public static int getPngWidth(Identifier id) {
+        Optional<Resource> resource = MinecraftClient.getInstance()
+                .getResourceManager()
+                .getResource(id);
+
+        if (resource.isPresent()) {
+            try (InputStream stream = resource.get().getInputStream();
+                 NativeImage image = NativeImage.read(stream)) {
+
+                return image.getWidth();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return 0; // Fallback if the file not found
+    }
+
+    public static int getPngHeight(Identifier id) {
+        Optional<Resource> resource = MinecraftClient.getInstance()
+                .getResourceManager()
+                .getResource(id);
+
+        if (resource.isPresent()) {
+            try (InputStream stream = resource.get().getInputStream();
+                 NativeImage image = NativeImage.read(stream)) {
+
+                return image.getHeight();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return 0; // Fallback if the file not found
     }
 }
