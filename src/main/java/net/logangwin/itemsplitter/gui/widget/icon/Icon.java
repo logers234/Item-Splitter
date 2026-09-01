@@ -1,21 +1,17 @@
-package net.logangwin.itemsplitter.gui.widget.indicator;
+package net.logangwin.itemsplitter.gui.widget.icon;
 
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
-public abstract class Indicator {
+public abstract class Icon {
 
-    private final int x;
-    private final int y;
     private final int width;
     private final int height;
     private final Identifier TEXTURE;
 
-    Indicator(int x, int y, Identifier texture) {
+    Icon(Identifier texture) {
         // Assign variables
-        this.x = x;
-        this.y = y;
         this.TEXTURE = texture;
 
         // Get PNG dimensions
@@ -35,7 +31,7 @@ public abstract class Indicator {
         return this.height;
     }
 
-    public void drawItems(DrawContext context, int x, int y, int width, int height) {
-
+    public void drawIcon(DrawContext context, int x, int y) {
+        context.drawGuiTexture(TEXTURE, x, y, this.width, this.height);
     }
 }
