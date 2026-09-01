@@ -25,7 +25,7 @@ public class SplitBarComponent implements TooltipComponent {
         String temp = String.valueOf(stackSize);
         int textWidth = (int) (textRenderer.getWidth(temp) * textScale);
         this.maxTextWidth = textWidth;
-        
+
         // Calculate total tooltip width
         this.width = this.barWidth + (this.barPadding * 2) + (textWidth * 2);
     }

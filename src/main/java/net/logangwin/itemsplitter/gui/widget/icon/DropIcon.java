@@ -4,7 +4,7 @@ import net.minecraft.util.Identifier;
 
 public class DropIcon extends Icon {
 
-    DropIcon() {
+    public DropIcon() {
         super(Identifier.of("item-splitter", "resources/icon.item-splitter/drop_icon.png"));
     }
 }
