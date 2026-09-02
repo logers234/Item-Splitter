@@ -1,11 +1,9 @@
 package net.logangwin.itemsplitter.gui;
 
-import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.logic.SplitScreenLogic;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
-import org.spongepowered.asm.mixin.Unique;
 
 public class SplitBarComponent implements TooltipComponent {
 
