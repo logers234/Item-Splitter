@@ -1,11 +1,11 @@
-package net.logangwin.itemsplitter.gui.widget.indicator;
+package net.logangwin.itemsplitter.gui.widget;
+
 
 import net.logangwin.itemsplitter.gui.widget.icon.Icon;
-import net.logangwin.itemsplitter.gui.widget.icon.PickupIcon;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-public class PickupIndicator {
+public class ItemIndicator {
 
     private final Icon icon;
     private final int indicatorWidth;
@@ -13,9 +13,9 @@ public class PickupIndicator {
     private final int maxTextWidth;
     private final float indicatorScale;
 
-    PickupIndicator(TextRenderer textRenderer, int maxTextWidth, float indicatorScale) {
+    public ItemIndicator(TextRenderer textRenderer, Icon icon, int maxTextWidth, float indicatorScale) {
         // Assign variables
-        this.icon = new PickupIcon();
+        this.icon = icon;
         this.maxTextWidth = maxTextWidth;
         this.indicatorScale = indicatorScale;
 
@@ -68,3 +68,4 @@ public class PickupIndicator {
         context.getMatrices().pop();
     }
 }
+

@@ -1,5 +1,9 @@
 package net.logangwin.itemsplitter.gui;
 
+import net.logangwin.itemsplitter.gui.widget.SplitBar;
+import net.logangwin.itemsplitter.gui.widget.icon.DropIcon;
+import net.logangwin.itemsplitter.gui.widget.icon.PickupIcon;
+import net.logangwin.itemsplitter.gui.widget.ItemIndicator;
 import net.logangwin.itemsplitter.logic.SplitScreenLogic;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -16,16 +20,24 @@ public class SplitBarComponent implements TooltipComponent {
     private final float textScale = 0.75F;
     private final int maxTextWidth;
 
+    private final ItemIndicator pickupIndicator;
+    private final ItemIndicator dropIndicator;
+    private final SplitBar splitBar;
+
     SplitBarComponent (TextRenderer textRenderer, double progress, int stackSize) {
         this.progress = progress;
 
         // Calculate maximum text width
-        String temp = String.valueOf(stackSize);
-        int textWidth = (int) (textRenderer.getWidth(temp) * textScale);
-        this.maxTextWidth = textWidth;
+        int maxTextWidth = textRenderer.getWidth(String.valueOf(stackSize));
+        this.maxTextWidth = (int) (maxTextWidth * textScale);
+
+        // Initialize pickup and drop indicators
+        this.pickupIndicator = new ItemIndicator(textRenderer, new PickupIcon(), maxTextWidth, textScale);
+        this.dropIndicator = new ItemIndicator(textRenderer, new DropIcon(), maxTextWidth, textScale);
+        this.splitBar = new SplitBar();
 
         // Calculate total tooltip width
-        this.width = this.barWidth + (this.barPadding * 2) + (textWidth * 2);
+        this.width = this.barWidth + (this.barPadding * 2) + (maxTextWidth * 2);
     }
 
     @Override
