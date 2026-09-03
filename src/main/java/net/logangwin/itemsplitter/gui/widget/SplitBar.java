@@ -23,7 +23,7 @@ public class SplitBar {
         return barWidth;
     }
 
-    public void drawSplitBar(DrawContext context, TextRenderer textRenderer, double progress, int x, int y) {
+    public void drawSplitBar(TextRenderer textRenderer, DrawContext context, double progress, int x, int y) {
         // Background
         context.fill(x, y, x + barWidth, y + barHeight, 0xFF292929);
 

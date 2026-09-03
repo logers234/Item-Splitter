@@ -32,6 +32,6 @@ public abstract class Icon {
     }
 
     public void drawIcon(DrawContext context, int x, int y) {
-        context.drawGuiTexture(TEXTURE, x, y, this.width, this.height);
+        context.drawTexture(this.TEXTURE, x, y, 0, 0, this.width, this.height, this.width, this.height);
     }
 }
