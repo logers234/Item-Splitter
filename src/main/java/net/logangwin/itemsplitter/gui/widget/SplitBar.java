@@ -8,11 +8,12 @@ public class SplitBar {
 
     private final int barHeight = 2;
     private final int barWidth = 50;
-    private final int thumbWidth = 2;
-    private final int thumbHeight = 4;
+    private final int thumbWidth;
+    private final int thumbHeight;
 
     public SplitBar() {
-
+        thumbWidth = 2;
+        thumbHeight = barHeight * 2;
     }
 
     public int getHeight() {

@@ -2,28 +2,31 @@ package net.logangwin.itemsplitter.gui.widget;
 
 
 import net.logangwin.itemsplitter.gui.widget.icon.Icon;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.item.ItemRenderer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 public class ItemIndicator {
 
     private final Icon icon;
     private final int indicatorWidth;
     private final int indicatorHeight;
-    private final int maxTextWidth;
     private final float indicatorScale;
 
     public ItemIndicator(TextRenderer textRenderer, Icon icon, int maxTextWidth, float indicatorScale) {
         // Assign variables
         this.icon = icon;
-        this.maxTextWidth = maxTextWidth;
         this.indicatorScale = indicatorScale;
 
+
         // Determine the width of indicator
-        this.indicatorWidth = (int) (Math.max(this.icon.getWidth(), maxTextWidth) * indicatorScale);
+        this.indicatorWidth = (int) (Math.max(this.icon.getWidth(), maxTextWidth) * this.indicatorScale);
 
         // Determine the height of the indicator
-        this.indicatorHeight = (int) ((icon.getHeight() + textRenderer.fontHeight) * indicatorScale);
+        this.indicatorHeight = (int) (Math.max(icon.getHeight(), textRenderer.fontHeight) * this.indicatorScale);
 
     }
 
@@ -40,32 +43,26 @@ public class ItemIndicator {
         String text = String.valueOf(currentItems);
         int textWidth = textRenderer.getWidth(text);
 
-        // Unscaled center axis
-        int unscaledWidth = Math.max(this.icon.getWidth(), maxTextWidth);
-        int unscaledCenterX = unscaledWidth / 2;
+        // Icon center x and y
+        int iconCenterX = (icon.getWidth() / 2);
+        int iconCenterY = (icon.getHeight() / 2);
 
-        // Position components relative to the unscaled center
-        int iconX = unscaledCenterX - (icon.getWidth() / 2);
-        int textX = unscaledCenterX - (textWidth / 2);
-        int textY = icon.getHeight();
+        // Centered text coordinates
+        int textX = iconCenterX - (textWidth / 2) + 1;
+        int textY = iconCenterY - (textRenderer.fontHeight / 2);
 
-        // Push the stack
+        // Setup scale
         context.getMatrices().push();
-
-        // Translate to indicator origin point
         context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(this.indicatorScale, this.indicatorScale, 1.0f);
 
-        // Apply the scale factor
-        context.getMatrices().scale(indicatorScale, indicatorScale, 1.0f);
+        // Draw icon and text
+        icon.drawIcon(context, 0, 0);
+        context.drawText(textRenderer, text, textX, textY, 0xFFFFFFFF, false);
 
-        // Draw icon
-        icon.drawIcon(context, iconX, 0);
-
-        // Draw the text
-        context.drawText(textRenderer, text, textX, textY, 0xFFFFFFFF, true);
-
-        // Reset context
+        // Reset stack
         context.getMatrices().pop();
+
     }
 }
 

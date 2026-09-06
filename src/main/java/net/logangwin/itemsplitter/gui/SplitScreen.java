@@ -47,7 +47,7 @@ public class SplitScreen {
 
             // Center screen above target slot
             slotX -= (components.getFirst().getWidth(textRenderer) / 2);
-            slotY -= 10;
+            slotY -= 10 + (components.getFirst().getHeight() / 2);
 
             // Render the tooltip at that specific spot
             ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, slotX, slotY, positioner);
