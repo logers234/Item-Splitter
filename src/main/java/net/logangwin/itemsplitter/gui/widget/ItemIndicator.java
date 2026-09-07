@@ -1,13 +1,8 @@
 package net.logangwin.itemsplitter.gui.widget;
 
-
 import net.logangwin.itemsplitter.gui.widget.icon.Icon;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.item.ItemRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 
 public class ItemIndicator {
 

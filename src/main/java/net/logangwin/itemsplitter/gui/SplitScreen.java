@@ -1,13 +1,11 @@
 package net.logangwin.itemsplitter.gui;
 
-import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.gui.tooltip.HoveredTooltipPositioner;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 import net.minecraft.client.gui.tooltip.TooltipPositioner;
@@ -40,7 +38,7 @@ public class SplitScreen {
             else {
                 // Add standard split bar to the component list
                 int stackSize = RightClickHandler.targetSlot.getStack().getCount();
-                components.add(new SplitBarComponent(textRenderer, SplitScreen.progress, stackSize));
+                components.add(new SplitScreenComponent(textRenderer, SplitScreen.progress, stackSize));
             }
             // Cancel out tooltip offsets
             slotX -= 12;
