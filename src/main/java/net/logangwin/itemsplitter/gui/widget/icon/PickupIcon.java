@@ -5,6 +5,6 @@ import net.minecraft.util.Identifier;
 public class PickupIcon extends Icon {
 
     public PickupIcon() {
-        super(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_alt2.png"));
+        super(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon.png"));
     }
 }
