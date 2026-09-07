@@ -1,25 +1,24 @@
 package net.logangwin.itemsplitter.gui;
 
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.widget.ItemIndicator;
 import net.logangwin.itemsplitter.gui.widget.SplitBar;
-import net.logangwin.itemsplitter.gui.widget.icon.PickupIcon;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 
-public class CreativeSplitBarComponent implements TooltipComponent {
+public class CreativeSplitScreenComponent implements TooltipComponent {
 
     private final double progress;
     private final int width;
     private final int height;
     private final int barPadding = 8;
-    private final int bottomPadding = 2;
 
     private final ItemIndicator pickupIndicator;
     private final SplitBar splitBar;
 
-    CreativeSplitBarComponent(TextRenderer textRenderer, double progress, int maxCount) {
+    CreativeSplitScreenComponent(TextRenderer textRenderer, double progress, int maxCount) {
         this.progress = progress;
         float indicatorScale = 1F;
 
@@ -27,7 +26,7 @@ public class CreativeSplitBarComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(maxCount));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, new PickupIcon(), maxTextWidth, indicatorScale);
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getPickupIconColor(), maxTextWidth, indicatorScale);
         this.splitBar = new SplitBar();
 
         // Calculate tooltip dimensions
@@ -37,6 +36,7 @@ public class CreativeSplitBarComponent implements TooltipComponent {
 
     @Override
     public int getHeight() {
+        int bottomPadding = 2;
         return height + bottomPadding;
     }
 

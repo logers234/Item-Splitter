@@ -33,7 +33,7 @@ public class SplitScreen {
             if (client.player.isCreative() && creativeSlot) {
                 // Add creative mode split bar to the component list
                 int maxCount = RightClickHandler.targetSlot.getStack().getMaxCount();
-                components.add(new CreativeSplitBarComponent(textRenderer, progress, maxCount));
+                components.add(new CreativeSplitScreenComponent(textRenderer, progress, maxCount));
             }
             else {
                 // Add standard split bar to the component list

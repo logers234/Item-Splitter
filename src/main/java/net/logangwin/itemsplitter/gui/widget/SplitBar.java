@@ -9,9 +9,6 @@ public class SplitBar {
     private final int barWidth = 50;
     private final int thumbWidth;
     private final int thumbHeight;
-    private final int borderColorTop = 0x505000FF; // 31% opacity
-    private final int borderColorBottom = 0x5028007F; // 31% opacity
-    private final int borderThickness = 1;
 
     public SplitBar() {
         thumbWidth = 2;
@@ -55,6 +52,11 @@ public class SplitBar {
     }
 
     private void drawSplitBarBorder(DrawContext context, int x, int y, int progressWidth) {
+        // Shared variables
+        int borderThickness = 1;
+        int BORDER_COLOR_TOP = 0x505000FF; // 31% opacity
+        int BORDER_COLOR_BOTTOM = 0x5028007F; // 31% opacity
+
         // ---- Vertical border shared variables ----
         int verticalBorderStartY = y - borderThickness;
         int verticalBorderEndY = y + barHeight + borderThickness;
@@ -64,10 +66,10 @@ public class SplitBar {
 
         // If the slider is at its minimum, push the left border over to fill the gap
         if (progressWidth == 0) {
-            context.fillGradient(leftBorderStartX - 1, verticalBorderStartY, x - 1, verticalBorderEndY, borderColorTop, borderColorBottom);
+            context.fillGradient(leftBorderStartX - 1, verticalBorderStartY, x - 1, verticalBorderEndY, BORDER_COLOR_TOP, BORDER_COLOR_BOTTOM);
         }
         else {
-            context.fillGradient(leftBorderStartX, verticalBorderStartY, x, verticalBorderEndY, borderColorTop, borderColorBottom);
+            context.fillGradient(leftBorderStartX, verticalBorderStartY, x, verticalBorderEndY, BORDER_COLOR_TOP, BORDER_COLOR_BOTTOM);
         }
 
         // Right border
@@ -76,10 +78,10 @@ public class SplitBar {
 
         // If the slider is at its maximum, push the right border over to fill the gap
         if (progressWidth == barWidth) {
-            context.fillGradient(rightBorderStartX + 1, verticalBorderStartY, rightBorderEndX + 1, verticalBorderEndY, borderColorTop, borderColorBottom);
+            context.fillGradient(rightBorderStartX + 1, verticalBorderStartY, rightBorderEndX + 1, verticalBorderEndY, BORDER_COLOR_TOP, BORDER_COLOR_BOTTOM);
         }
         else {
-            context.fillGradient(rightBorderStartX, verticalBorderStartY, rightBorderEndX, verticalBorderEndY, borderColorTop, borderColorBottom);
+            context.fillGradient(rightBorderStartX, verticalBorderStartY, rightBorderEndX, verticalBorderEndY, BORDER_COLOR_TOP, BORDER_COLOR_BOTTOM);
         }
 
         // ---- Horizontal border shared variables ----
@@ -89,13 +91,13 @@ public class SplitBar {
         int horizontalRightBorderEnd = x + barWidth;
 
         // Top border
-        context.fill(x, topHorizontalBorderStartY, horizontalLeftBorderEndX, y, borderColorTop);
-        context.fill(horizontalLeftBorderEndX + thumbWidth, topHorizontalBorderStartY, horizontalRightBorderEnd, y, borderColorTop);
+        context.fill(x, topHorizontalBorderStartY, horizontalLeftBorderEndX, y, BORDER_COLOR_TOP);
+        context.fill(horizontalLeftBorderEndX + thumbWidth, topHorizontalBorderStartY, horizontalRightBorderEnd, y, BORDER_COLOR_TOP);
 
         // Bottom border
         int bottomLeftBorderEndY = y + barHeight + borderThickness;
-        context.fill(x, bottomHorizontalBorderStartY, horizontalLeftBorderEndX, bottomLeftBorderEndY, borderColorBottom);
-        context.fill(horizontalLeftBorderEndX + thumbWidth, bottomHorizontalBorderStartY, horizontalRightBorderEnd, bottomHorizontalBorderStartY + borderThickness, borderColorBottom);
+        context.fill(x, bottomHorizontalBorderStartY, horizontalLeftBorderEndX, bottomLeftBorderEndY, BORDER_COLOR_BOTTOM);
+        context.fill(horizontalLeftBorderEndX + thumbWidth, bottomHorizontalBorderStartY, horizontalRightBorderEnd, bottomHorizontalBorderStartY + borderThickness, BORDER_COLOR_BOTTOM);
 
         // ---- Thumb border shared variables ----
         int thumbBorderStartX = x + progressWidth - (thumbWidth / 2) - borderThickness;
@@ -103,10 +105,10 @@ public class SplitBar {
 
         // Thumb top
         int thumbTopBorderStartY = y - (thumbHeight / 2);
-        context.fill(thumbBorderStartX, thumbTopBorderStartY, thumbBorderEndX, thumbTopBorderStartY + borderThickness, borderColorTop);
+        context.fill(thumbBorderStartX, thumbTopBorderStartY, thumbBorderEndX, thumbTopBorderStartY + borderThickness, BORDER_COLOR_TOP);
 
         // Thumb bottom
         int thumbBottomBorderStartY = y + barHeight + (thumbHeight / 2);
-        context.fill(thumbBorderStartX, thumbBottomBorderStartY, thumbBorderEndX, thumbBottomBorderStartY - borderThickness, borderColorBottom);
+        context.fill(thumbBorderStartX, thumbBottomBorderStartY, thumbBorderEndX, thumbBottomBorderStartY - borderThickness, BORDER_COLOR_BOTTOM);
     }
 }

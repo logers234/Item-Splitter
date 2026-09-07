@@ -1,6 +1,5 @@
 package net.logangwin.itemsplitter.gui.widget;
 
-import net.logangwin.itemsplitter.gui.widget.icon.Icon;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 

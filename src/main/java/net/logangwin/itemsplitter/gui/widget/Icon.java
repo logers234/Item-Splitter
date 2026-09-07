@@ -1,30 +1,34 @@
-package net.logangwin.itemsplitter.gui.widget.icon;
+package net.logangwin.itemsplitter.gui.widget;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
 
-public abstract class Icon {
+public class Icon {
 
-    private final int width;
-    private final int height;
+    private int width = -1;
+    private int height = -1;
     private final Identifier TEXTURE;
 
-    Icon(Identifier texture) {
+    public Icon(Identifier texture) {
         // Assign variables
         this.TEXTURE = texture;
-
-        // Get PNG dimensions
-        this.width = ItemSplitterUtils.getPngWidth(this.TEXTURE);
-        this.height = ItemSplitterUtils.getPngHeight(this.TEXTURE);
     }
 
     public int getWidth() {
+        // Calculate and set width when method is first called
+        if (this.width == -1) {
+            this.width = ItemSplitterUtils.getPngWidth(this.TEXTURE);
+        }
         return this.width;
     }
 
     public int getHeight() {
+        // Calculate and set height when method is first called
+        if (this.height == -1) {
+            this.height = ItemSplitterUtils.getPngHeight(this.TEXTURE);
+        }
         return this.height;
     }
 

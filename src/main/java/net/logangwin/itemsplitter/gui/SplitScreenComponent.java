@@ -1,8 +1,7 @@
 package net.logangwin.itemsplitter.gui;
 
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.widget.SplitBar;
-import net.logangwin.itemsplitter.gui.widget.icon.DropIcon;
-import net.logangwin.itemsplitter.gui.widget.icon.PickupIcon;
 import net.logangwin.itemsplitter.gui.widget.ItemIndicator;
 import net.logangwin.itemsplitter.logic.SplitScreenLogic;
 import net.minecraft.client.font.TextRenderer;
@@ -15,7 +14,6 @@ public class SplitScreenComponent implements TooltipComponent {
     private final int width;
     private final int height;
     private final int barPadding = 8;
-    private final int bottomPadding = 2;
 
     private final ItemIndicator pickupIndicator;
     private final ItemIndicator dropIndicator;
@@ -29,8 +27,8 @@ public class SplitScreenComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(stackSize));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, new PickupIcon(), maxTextWidth, indicatorScale);
-        this.dropIndicator = new ItemIndicator(textRenderer, new DropIcon(), maxTextWidth, indicatorScale);
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getPickupIconColor(), maxTextWidth, indicatorScale);
+        this.dropIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getDropIconColor(), maxTextWidth, indicatorScale);
         this.splitBar = new SplitBar();
 
         // Calculate tooltip dimensions
@@ -40,6 +38,7 @@ public class SplitScreenComponent implements TooltipComponent {
 
     @Override
     public int getHeight() {
+        int bottomPadding = 2;
         return height + bottomPadding;
     }
 

@@ -3,9 +3,16 @@ package net.logangwin.itemsplitter;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.logangwin.itemsplitter.gui.SplitScreen;
+import net.logangwin.itemsplitter.gui.widget.Icon;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
+import net.minecraft.util.Identifier;
 
 public class ItemSplitterClient implements ClientModInitializer {
+
+    private static Icon pickupIconMinimal;
+    private static Icon pickupIconColor;
+    private static Icon dropIconMinimal;
+    private static Icon dropIconColor;
 
     @Override
     public void onInitializeClient() {
@@ -14,9 +21,31 @@ public class ItemSplitterClient implements ClientModInitializer {
 
         // Initialize GUI elements
         SplitScreen.initialize();
+
+        // Load icons
+        pickupIconMinimal = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_minimal.png"));
+        pickupIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_color.png"));
+        dropIconMinimal = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_minimal.png"));
+        dropIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_color.png"));
     }
 
     public void tick() {
         RightClickHandler.tick();
+    }
+
+    public static Icon getPickupIconMinimal() {
+        return pickupIconMinimal;
+    }
+
+    public static Icon getPickupIconColor() {
+        return pickupIconColor;
+    }
+
+    public static Icon getDropIconMinimal() {
+        return dropIconMinimal;
+    }
+
+    public static Icon getDropIconColor() {
+        return dropIconColor;
     }
 }
