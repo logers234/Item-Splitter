@@ -1,5 +1,6 @@
 package net.logangwin.itemsplitter.gui.widget.icon;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.util.Identifier;
@@ -19,10 +20,6 @@ public abstract class Icon {
         this.height = ItemSplitterUtils.getPngHeight(this.TEXTURE);
     }
 
-    public Identifier getTexture() {
-        return this.TEXTURE;
-    }
-
     public int getWidth() {
         return this.width;
     }
@@ -32,6 +29,9 @@ public abstract class Icon {
     }
 
     public void drawIcon(DrawContext context, int x, int y) {
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         context.drawTexture(this.TEXTURE, x, y, 0, 0, this.width, this.height, this.width, this.height);
+        RenderSystem.disableBlend();
     }
 }

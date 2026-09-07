@@ -1,7 +1,6 @@
 package net.logangwin.itemsplitter.gui.widget;
 
 import net.logangwin.itemsplitter.logic.SplitScreenLogic;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
 public class SplitBar {
@@ -24,13 +23,17 @@ public class SplitBar {
         return barWidth;
     }
 
-    public void drawSplitBar(TextRenderer textRenderer, DrawContext context, double progress, int x, int y) {
+    public void drawSplitBar(DrawContext context, double progress, int x, int y) {
+        int currentItems = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
+        this.drawSplitBar(context, currentItems, SplitScreenLogic.getMaxSplit(), x, y);
+    }
+
+    public void drawSplitBar(DrawContext context, int currentItems, int maxSplit, int x, int y) {
         // Background
         context.fill(x, y, x + barWidth, y + barHeight, 0xFF292929);
 
         // Calculate the width of split bar based on how many items are being split
-        int currentItems = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
-        int progressWidth = (currentItems * barWidth) / SplitScreenLogic.getMaxSplit();
+        int progressWidth = (currentItems * barWidth) / maxSplit;
 
         // Draw split bar
         context.fill(x, y, x + progressWidth, y + barHeight, 0xFFFFFFFF);

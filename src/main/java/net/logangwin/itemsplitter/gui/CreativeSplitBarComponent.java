@@ -1,5 +1,8 @@
 package net.logangwin.itemsplitter.gui;
 
+import net.logangwin.itemsplitter.gui.widget.ItemIndicator;
+import net.logangwin.itemsplitter.gui.widget.SplitBar;
+import net.logangwin.itemsplitter.gui.widget.icon.PickupIcon;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -10,33 +13,31 @@ public class CreativeSplitBarComponent implements TooltipComponent {
     private final double progress;
     private final int width;
     private final int height;
-    private final int barHeight = 2;
-    private final int heightPadding = 5;
-    private final int barWidth = 50;
-    private final int barPadding = 4;
-    private final float textScale = 0.75F;
-    private final int thumbHeight = 4;
-    private final int thumbPadding = 2;
-    private final int textHeight;
-    private final int maxTextWidth;
+    private final int barPadding = 8;
+    private final int bottomPadding = 2;
+
+    private final ItemIndicator pickupIndicator;
+    private final SplitBar splitBar;
 
     CreativeSplitBarComponent(TextRenderer textRenderer, double progress, int maxCount) {
         this.progress = progress;
-        this.textHeight = (int) (textRenderer.fontHeight * textScale);
+        float indicatorScale = 1F;
 
-        // Calculate total tooltip width
-        this.width = this.barWidth + (this.barPadding * 2);
+        // Calculate maximum text width
+        int maxTextWidth = textRenderer.getWidth(String.valueOf(maxCount));
 
-        // Calculate total tooltip height
-        this.height = barHeight + thumbPadding + textHeight;
+        // Initialize widgets
+        this.pickupIndicator = new ItemIndicator(textRenderer, new PickupIcon(), maxTextWidth, indicatorScale);
+        this.splitBar = new SplitBar();
 
-        // Calculate max text width
-        this.maxTextWidth = (int) (textRenderer.getWidth(String.valueOf(maxCount)) * textScale);
+        // Calculate tooltip dimensions
+        this.width = this.pickupIndicator.getWidth() + this.splitBar.getWidth() + barPadding;
+        this.height = Math.max(this.pickupIndicator.getHeight(), this.splitBar.getHeight());
     }
 
     @Override
     public int getHeight() {
-        return height + heightPadding;
+        return height + bottomPadding;
     }
 
     @Override
@@ -46,67 +47,14 @@ public class CreativeSplitBarComponent implements TooltipComponent {
 
     @Override
     public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
-        // Calculate offset
-        int currentItems = Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * progress));
-        String text = String.valueOf(currentItems);
-        int textWidth = (int) (textRenderer.getWidth(text) * textScale);
-        int progressWidth = (currentItems * barWidth) / RightClickHandler.targetSlot.getStack().getMaxCount();
-
-        // Render split bar
-        drawSplitBar(context, textRenderer, x, y);
-
-        // Calculate text positions
-        int textAnchor = x + progressWidth + barPadding;
-        int textX = textAnchor - (textWidth / 2);
-        int textY = y + height - (thumbHeight / 2) - thumbPadding - textHeight;
-
-        // Draw text
-        drawPickupText(textRenderer, context, text, textX, textY);
-    }
-
-    private void drawSplitBar(DrawContext context, TextRenderer textRenderer, int x, int y) {
-        // Values
-        int thumbWidth = 2;
-
-        // Calculate offsets
-        int center = (int) Math.floor(this.getWidth(textRenderer) / 2.0F);
-        int barX = x + center - (barWidth / 2);
-        int barY = y + height;
-
-        // Background
-        context.fill(barX, barY, barX + barWidth, barY + barHeight, 0xFF292929);
-
-        // Calculate the width of split bar based on how many items are being split
-        int currentItems = Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * progress));
-        int progressWidth = (currentItems * barWidth) / RightClickHandler.targetSlot.getStack().getMaxCount();
-
         // Draw split bar
-        context.fill(barX, barY, barX + progressWidth, barY + barHeight, 0xFFFFFFFF);
+        int splitBarX = x + (barPadding / 2);
+        int splitBarY = y + (height / 2) - (splitBar.getHeight() / 2);
+        int currentItems = Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * progress));
+        splitBar.drawSplitBar(context, currentItems, RightClickHandler.targetSlot.getStack().getMaxCount(), splitBarX, splitBarY);
 
-        // Draw split bar thumb
-        context.fill(
-                barX + progressWidth - (thumbWidth / 2),
-                barY + (barHeight / 2) + (thumbHeight / 2),
-                barX + progressWidth + (thumbWidth / 2),
-                barY + (barHeight / 2) - (thumbHeight / 2),
-                0xFFFFFFFF
-        );
-    }
-
-    private void drawPickupText(TextRenderer textRenderer, DrawContext context, String text, int textX, int textY) {
-        // Push the stack
-        context.getMatrices().push();
-
-        // Translate to text origin point
-        context.getMatrices().translate(textX, textY, 0);
-
-        // Apply the scale factor
-        context.getMatrices().scale(textScale, textScale, 1.0f);
-
-        // Draw the text
-        context.drawText(textRenderer, text, 0, 0, 0xFFFFFFFF, true);
-
-        // Reset context
-        context.getMatrices().pop();
+        // Draw pickup indicator
+        int indicatorX = x + splitBar.getWidth() + barPadding;
+        pickupIndicator.drawIndicator(textRenderer, context, indicatorX, y, currentItems);
     }
 }

@@ -9,37 +9,38 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
 
-public class SplitBarComponent implements TooltipComponent {
+public class SplitScreenComponent implements TooltipComponent {
 
     private final double progress;
     private final int width;
     private final int height;
     private final int barPadding = 8;
+    private final int bottomPadding = 2;
 
     private final ItemIndicator pickupIndicator;
     private final ItemIndicator dropIndicator;
     private final SplitBar splitBar;
 
-    SplitBarComponent (TextRenderer textRenderer, double progress, int stackSize) {
+    SplitScreenComponent(TextRenderer textRenderer, double progress, int stackSize) {
         this.progress = progress;
         float indicatorScale = 1F;
 
         // Calculate maximum text width
         int maxTextWidth = textRenderer.getWidth(String.valueOf(stackSize));
 
-        // Initialize pickup and drop indicators
+        // Initialize widgets
         this.pickupIndicator = new ItemIndicator(textRenderer, new PickupIcon(), maxTextWidth, indicatorScale);
         this.dropIndicator = new ItemIndicator(textRenderer, new DropIcon(), maxTextWidth, indicatorScale);
         this.splitBar = new SplitBar();
 
-        // Calculate total tooltip width
+        // Calculate tooltip dimensions
         this.width = this.pickupIndicator.getWidth() + this.dropIndicator.getWidth() + this.splitBar.getWidth() + barPadding;
-        this.height = Math.max(Math.max(this.pickupIndicator.getHeight(), this.dropIndicator.getHeight()), this.splitBar.getHeight()) + 2;
+        this.height = Math.max(Math.max(this.pickupIndicator.getHeight(), this.dropIndicator.getHeight()), this.splitBar.getHeight());
     }
 
     @Override
     public int getHeight() {
-        return height;
+        return height + bottomPadding;
     }
 
     @Override
@@ -57,7 +58,7 @@ public class SplitBarComponent implements TooltipComponent {
         // Draw split bar
         int splitBarX = x + dropIndicator.getWidth() + (barPadding / 2);
         int splitBarY = y + (height / 2) - (splitBar.getHeight() / 2);
-        splitBar.drawSplitBar(textRenderer, context, progress, splitBarX, splitBarY);
+        splitBar.drawSplitBar(context, progress, splitBarX, splitBarY);
 
         // Draw pickup indicator
         int pickupIndicatorX = x + dropIndicator.getWidth() + splitBar.getWidth() + barPadding;
