@@ -33,6 +33,7 @@ public class ItemSplitterClient implements ClientModInitializer {
         RightClickHandler.tick();
     }
 
+    @SuppressWarnings("unused")
     public static Icon getPickupIconMinimal() {
         return pickupIconMinimal;
     }
@@ -41,6 +42,7 @@ public class ItemSplitterClient implements ClientModInitializer {
         return pickupIconColor;
     }
 
+    @SuppressWarnings("unused")
     public static Icon getDropIconMinimal() {
         return dropIconMinimal;
     }

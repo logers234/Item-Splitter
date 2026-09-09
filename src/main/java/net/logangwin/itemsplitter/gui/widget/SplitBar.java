@@ -36,7 +36,7 @@ public class SplitBar {
         drawSplitBarBorder(context, x, y, progressWidth);
 
         // Background
-        context.fill(x, y, x + barWidth, y + barHeight, 0xFF292929);
+        context.fill(x + progressWidth, y, x + barWidth, y + barHeight, 0xFF292929);
 
         // Draw split bar
         context.fill(x, y, x + progressWidth, y + barHeight, 0xFFFFFFFF);

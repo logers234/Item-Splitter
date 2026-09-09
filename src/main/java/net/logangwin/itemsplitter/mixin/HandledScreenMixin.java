@@ -12,7 +12,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,7 +27,8 @@ public abstract class HandledScreenMixin extends Screen {
     @Shadow protected int x;
     @Shadow protected int y;
 
-    @Shadow protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
+    @Unique
+    protected abstract void onMouseClick(Slot slot, int slotId, int button);
 
     @SuppressWarnings("unused")
     public HandledScreenMixin() {
@@ -43,7 +43,8 @@ public abstract class HandledScreenMixin extends Screen {
             // Start the timer, get the target slot and block the right click action
             RightClickHandler.startCharging();
             RightClickHandler.targetSlot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
-            RightClickHandler.targetSlotID = this.getSlotIDUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
+            assert RightClickHandler.targetSlot != null;
+            RightClickHandler.targetSlotID = RightClickHandler.targetSlot.getIndex();
             RightClickHandler.actionTriggered = false;
             cir.setReturnValue(true);
             cir.cancel();
@@ -84,7 +85,7 @@ public abstract class HandledScreenMixin extends Screen {
                 // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
+                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button);
                 }
             }
 
@@ -118,21 +119,6 @@ public abstract class HandledScreenMixin extends Screen {
         int slotY = this.y + slot.y;
         return mouseX >= slotX && mouseX < slotX + 16 &&
                 mouseY >= slotY && mouseY < slotY + 16;
-    }
-
-    @Unique
-    private int getSlotIDUnderMouse(HandledScreen<?> screen, double mouseX, double mouseY) {
-        // Find the id of slot the mouse is currently over
-        for (int i = 0; i < screen.getScreenHandler().slots.size(); i++) {
-            Slot slot = screen.getScreenHandler().slots.get(i);
-            if (isPointOverSlot(slot, mouseX, mouseY) && slot.isEnabled()) {
-                // Return index of slot
-                return i;
-            }
-        }
-
-        // Returns -1 if no slot found
-        return -1;
     }
 
     @Unique

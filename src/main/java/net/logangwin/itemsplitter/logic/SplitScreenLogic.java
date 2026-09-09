@@ -16,9 +16,6 @@ public class SplitScreenLogic {
     private static int splitAmount;
     private static final int minSplit = 0;
     private static int maxSplit = 0;
-    private static int mouseX;
-    private static int mouseY;
-    private static final MinecraftClient client = MinecraftClient.getInstance();
 
     public static void onScreenOpen(Slot targetSlot) {
         if (targetSlot != null) {
@@ -41,10 +38,6 @@ public class SplitScreenLogic {
         return isOpen;
     }
 
-    public static int getSplitAmount() {
-        return splitAmount;
-    }
-
     public static int getMaxSplit() {
         return maxSplit;
     }
@@ -53,15 +46,6 @@ public class SplitScreenLogic {
         if (itemCount >= minSplit || itemCount <= maxSplit) {
             splitAmount = itemCount;
         }
-    }
-
-    public static void saveMouseCoordinates(double x, double y) {
-        // Get client
-        MinecraftClient client = MinecraftClient.getInstance();
-
-        // Store scaled coordinates
-        mouseX = (int) (x / client.getWindow().getScaleFactor());
-        mouseY = (int) (y / client.getWindow().getScaleFactor());
     }
 
     public static void updateSplitSlider() {
@@ -122,19 +106,20 @@ public class SplitScreenLogic {
 
         // Use a different splitting process if player is in creative and within their own inventory
         if (client.player.isCreative() && screen.getScreenHandler().syncId == 0) {
+            if (splitAmount != 0) {
+                // Create copies of the cursor and leftover stacks
+                ItemStack stack = targetSlot.getStack().copyWithCount(splitAmount);
+                ItemStack remainingStack = targetSlot.getStack().copyWithCount(itemsInStack - splitAmount);
 
-            // Create copies of the cursor and leftover stacks
-            ItemStack stack = targetSlot.getStack().copyWithCount(splitAmount);
-            ItemStack remainingStack = targetSlot.getStack().copyWithCount(itemsInStack - splitAmount);
+                // Set cursor locally
+                screen.getScreenHandler().setCursorStack(stack);
 
-            // Set cursor locally
-            screen.getScreenHandler().setCursorStack(stack);
+                // Update slot locally
+                targetSlot.setStack(remainingStack);
 
-            // Update slot locally
-            targetSlot.setStack(remainingStack);
-
-            // Update the target slot leftover quantity
-            client.interactionManager.clickCreativeStack(remainingStack, slotId);
+                // Update the target slot leftover quantity
+                client.interactionManager.clickCreativeStack(remainingStack, targetSlot.getIndex());
+            }
 
             return;
         }

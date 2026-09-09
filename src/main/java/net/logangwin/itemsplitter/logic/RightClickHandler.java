@@ -1,6 +1,5 @@
 package net.logangwin.itemsplitter.logic;
 
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 
 public class RightClickHandler
