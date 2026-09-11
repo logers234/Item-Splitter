@@ -2,6 +2,7 @@ package net.logangwin.itemsplitter;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.gui.widget.Icon;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
@@ -27,6 +28,9 @@ public class ItemSplitterClient implements ClientModInitializer {
         pickupIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_color.png"));
         dropIconMinimal = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_minimal.png"));
         dropIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_color.png"));
+
+        // Initialize config screen
+        ConfigScreen.init();
     }
 
     public void tick() {

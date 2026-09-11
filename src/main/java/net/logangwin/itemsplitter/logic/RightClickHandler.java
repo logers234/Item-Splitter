@@ -1,5 +1,6 @@
 package net.logangwin.itemsplitter.logic;
 
+import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.minecraft.screen.slot.Slot;
 
 public class RightClickHandler
@@ -9,7 +10,6 @@ public class RightClickHandler
     public static Slot targetSlot = null;
     public static int targetSlotID = -1;
     public static boolean actionTriggered = false;
-    public static int maxCharge = 1000;
 
     public static void startCharging() {
         // Begin charge when right click is held
@@ -25,7 +25,7 @@ public class RightClickHandler
 
     public static float getChargePercent() {
         // Get the percentage of how far the charge is to the threshold
-        return (float) (System.currentTimeMillis() - chargeStart) / maxCharge;
+        return (float) (System.currentTimeMillis() - chargeStart) / ConfigScreen.INSTANCE.timeDelay;
     }
 
     public static boolean isCharging() {
@@ -40,7 +40,7 @@ public class RightClickHandler
 
     public static boolean checkIfReleasedEarly() {
         // If the mouse button is released before 1 second has passed, reset the timer and return true
-        if (isCharging && System.currentTimeMillis() - chargeStart < maxCharge) {
+        if (isCharging && System.currentTimeMillis() - chargeStart < ConfigScreen.INSTANCE.timeDelay) {
             stopCharging();
             return true;
         }
@@ -51,7 +51,7 @@ public class RightClickHandler
 
     public static void tick()
     {
-        if (isCharging && System.currentTimeMillis() - chargeStart > maxCharge) {
+        if (isCharging && System.currentTimeMillis() - chargeStart > ConfigScreen.INSTANCE.timeDelay) {
 
             // If the charge threshold is reached, open the split screen
             try {

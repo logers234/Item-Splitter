@@ -5,7 +5,7 @@
 	"name": "Item Splitter",
 	"description": "This is an example description! Tell everyone what your mod is about!",
 	"authors": [
-		"Logan Gwin"
+		"logers234"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -23,6 +23,9 @@
 		],
 		"client": [
 			"net.logangwin.itemsplitter.ItemSplitterClient"
+		],
+		"modmenu": [
+			"net.logangwin.itemsplitter.gui.ItemSplitterModMenu"
 		]
 	},
 	"mixins": [
