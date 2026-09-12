@@ -27,8 +27,8 @@ public class SplitScreenComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(stackSize));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getPickupIconColor(), maxTextWidth, indicatorScale);
-        this.dropIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getDropIconColor(), maxTextWidth, indicatorScale);
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale);
+        this.dropIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentDropIcon(), maxTextWidth, indicatorScale);
         this.splitBar = new SplitBar();
 
         // Calculate tooltip dimensions

@@ -2,5 +2,6 @@
   "text.autoconfig.itemsplitter.title": "Item Splitter",
   "text.autoconfig.itemsplitter.option.enableChargeCircle": "Enable Charge Circle",
   "text.autoconfig.itemsplitter.option.timeDelay": "Time Delay",
-  "text.autoconfig.itemsplitter.option.splitCircleStartDelay": "Split Circle Start Delay"
+  "text.autoconfig.itemsplitter.option.splitCircleStartDelay": "Split Circle Start Delay",
+  "text.autoconfig.itemsplitter.option.iconState": "Icon Type"
 }

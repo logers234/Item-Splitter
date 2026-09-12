@@ -3,6 +3,7 @@ package net.logangwin.itemsplitter.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleHud;
@@ -12,6 +13,7 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,8 +29,8 @@ public abstract class HandledScreenMixin extends Screen {
     @Shadow protected int x;
     @Shadow protected int y;
 
-    @Unique
-    protected abstract void onMouseClick(Slot slot, int slotId, int button);
+    @Shadow
+    protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
 
     @SuppressWarnings("unused")
     public HandledScreenMixin() {
@@ -85,7 +87,7 @@ public abstract class HandledScreenMixin extends Screen {
                 // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button);
+                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
                 }
             }
 
@@ -148,7 +150,7 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (RightClickHandler.isCharging() && RightClickHandler.targetSlot != null && RightClickHandler.getChargeTime() > 100 && RightClickHandler.targetSlot.hasStack()) {
+        if (RightClickHandler.isCharging() && RightClickHandler.targetSlot != null && RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.targetSlot.hasStack()) {
             // Get the charge percentage
             float progress = RightClickHandler.getChargePercent();
 

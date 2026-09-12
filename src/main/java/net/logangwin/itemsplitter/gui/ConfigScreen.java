@@ -24,4 +24,13 @@ public class ConfigScreen implements ConfigData {
 
     @ConfigEntry.Gui.Tooltip()
     public int splitCircleStartDelay = 100;
+
+    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+    public IconState iconState = IconState.COLORED;
+
+    public enum IconState {
+        MINIMAL,
+        COLORED,
+        WHITE
+    }
 }

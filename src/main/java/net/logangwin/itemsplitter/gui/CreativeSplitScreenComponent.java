@@ -26,7 +26,7 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(maxCount));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getPickupIconColor(), maxTextWidth, indicatorScale);
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale);
         this.splitBar = new SplitBar();
 
         // Calculate tooltip dimensions

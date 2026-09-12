@@ -37,21 +37,25 @@ public class ItemSplitterClient implements ClientModInitializer {
         RightClickHandler.tick();
     }
 
-    @SuppressWarnings("unused")
-    public static Icon getPickupIconMinimal() {
-        return pickupIconMinimal;
+    public static Icon getCurrentPickupIcon() {
+        ConfigScreen.IconState iconState = ConfigScreen.INSTANCE.iconState;
+
+        // Determine which icon type is currently selected
+        switch (iconState) {
+            case MINIMAL -> { return pickupIconMinimal; }
+            case WHITE -> { return pickupIconColor; }
+            default -> { return pickupIconColor; }
+        }
     }
 
-    public static Icon getPickupIconColor() {
-        return pickupIconColor;
-    }
+    public static Icon getCurrentDropIcon() {
+        ConfigScreen.IconState iconState = ConfigScreen.INSTANCE.iconState;
 
-    @SuppressWarnings("unused")
-    public static Icon getDropIconMinimal() {
-        return dropIconMinimal;
-    }
-
-    public static Icon getDropIconColor() {
-        return dropIconColor;
+        // Determine which icon type is currently selected
+        switch (iconState) {
+            case MINIMAL -> { return dropIconMinimal; }
+            case WHITE -> { return dropIconColor; }
+            default -> { return dropIconColor;}
+        }
     }
 }
