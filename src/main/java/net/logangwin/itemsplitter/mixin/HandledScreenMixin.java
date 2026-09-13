@@ -44,9 +44,8 @@ public abstract class HandledScreenMixin extends Screen {
 
             // Start the timer, get the target slot and block the right click action
             RightClickHandler.startCharging();
-            RightClickHandler.targetSlot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
-            assert RightClickHandler.targetSlot != null;
-            RightClickHandler.targetSlotID = RightClickHandler.targetSlot.getIndex();
+            RightClickHandler.setTargetSlot(this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY));
+
             RightClickHandler.actionTriggered = false;
             cir.setReturnValue(true);
             cir.cancel();
@@ -69,25 +68,25 @@ public abstract class HandledScreenMixin extends Screen {
             // Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
 
-            if (!releasedEarly && RightClickHandler.targetSlot != null) {
+            if (!releasedEarly && RightClickHandler.getTargetSlot() != null) {
                 // Right click hold passed 1 second threshold, do custom splitting logic here
 
-                boolean creativeSlot = ItemSplitterUtils.isCreativeSlot((HandledScreen<?>) (Object) this, RightClickHandler.targetSlot);
+                boolean creativeSlot = ItemSplitterUtils.isCreativeSlot((HandledScreen<?>) (Object) this, RightClickHandler.getTargetSlot());
 
                 if (client.player.isCreative() && creativeSlot) {
                     ItemSplitter.LOGGER.info("Performing Creative Pickup Operation");
-                    SplitScreenLogic.creativePickupStack(RightClickHandler.targetSlot);
+                    SplitScreenLogic.creativePickupStack(RightClickHandler.getTargetSlot());
                 }
                 else {
                     ItemSplitter.LOGGER.info("Performing Standard Custom Split");
-                    SplitScreenLogic.splitStack(RightClickHandler.targetSlot);
+                    SplitScreenLogic.splitStack(RightClickHandler.getTargetSlot());
                 }
             }
             else {
                 // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
-                if (RightClickHandler.targetSlot != null) {
-                    this.onMouseClick(RightClickHandler.targetSlot, RightClickHandler.targetSlot.getIndex(), button, SlotActionType.PICKUP);
+                if (RightClickHandler.getTargetSlot() != null) {
+                    this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotID(), button, SlotActionType.PICKUP);
                 }
             }
 
@@ -95,8 +94,7 @@ public abstract class HandledScreenMixin extends Screen {
             if (SplitScreenLogic.isScreenOpen()) {
                 ItemSplitter.LOGGER.info("Closing screen");
                 SplitScreenLogic.onScreenClose();
-                RightClickHandler.targetSlot = null;
-                RightClickHandler.targetSlotID = -1;
+                RightClickHandler.setTargetSlot(null);
             }
 
             // Block vanilla action (we already manually sent the packet above)
@@ -150,7 +148,7 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (RightClickHandler.isCharging() && RightClickHandler.targetSlot != null && RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.targetSlot.hasStack()) {
+        if (RightClickHandler.isCharging() && RightClickHandler.getTargetSlot() != null && RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.getTargetSlot().hasStack()) {
             // Get the charge percentage
             float progress = RightClickHandler.getChargePercent();
 
@@ -160,19 +158,16 @@ public abstract class HandledScreenMixin extends Screen {
             RenderSystem.disableDepthTest();
 
             // Get slot coordinates and draw the circles
-            int slotX = getItemSlotX(RightClickHandler.targetSlot);
-            int slotY = getItemSlotY(RightClickHandler.targetSlot);
+            int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
+            int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
             ChargeCircleHud.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
 
             // Reset the offset
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
-        } else {
-            // Hide when not splitting
-            ChargeCircleHud.drawProgressRing(context, 0, 0, 6, 3, 0, 0x00000000);
         }
 
-        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.targetSlot != null && RightClickHandler.targetSlot.getStack().getCount() > 0) {
+        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.getTargetSlot() != null && RightClickHandler.getTargetSlot().getStack().getCount() > 0) {
             // ---- Render Split Screen Tooltip ----
             SplitScreenLogic.updateSplitSlider();
 
@@ -181,11 +176,11 @@ public abstract class HandledScreenMixin extends Screen {
             context.getMatrices().translate(0, 0, 550);
 
             // Get slot coordinates for tooltip
-            int slotX = getItemSlotX(RightClickHandler.targetSlot);
-            int slotY = getItemSlotY(RightClickHandler.targetSlot);
+            int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
+            int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
 
             // Draw tooltip
-            SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.targetSlot);
+            SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.getTargetSlot());
 
             // Reset the offset and re-enable depth testing
             RenderSystem.enableDepthTest();

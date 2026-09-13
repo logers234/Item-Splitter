@@ -50,8 +50,8 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
         // Draw split bar
         int splitBarX = x + (barPadding / 2);
         int splitBarY = y + (height / 2) - (splitBar.getHeight() / 2);
-        int currentItems = Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * progress));
-        splitBar.drawSplitBar(context, currentItems, RightClickHandler.targetSlot.getStack().getMaxCount(), splitBarX, splitBarY);
+        int currentItems = Math.round((float) (RightClickHandler.getTargetSlot().getStack().getMaxCount() * progress));
+        splitBar.drawSplitBar(context, currentItems, RightClickHandler.getTargetSlot().getStack().getMaxCount(), splitBarX, splitBarY);
 
         // Draw pickup indicator
         int indicatorX = x + splitBar.getWidth() + barPadding;

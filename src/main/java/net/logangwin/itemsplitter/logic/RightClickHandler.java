@@ -7,8 +7,7 @@ public class RightClickHandler
 {
     private static boolean isCharging = false;
     private static long chargeStart = 0;
-    public static Slot targetSlot = null;
-    public static int targetSlotID = -1;
+    private static Slot targetSlot = null;
     public static boolean actionTriggered = false;
 
     public static void startCharging() {
@@ -21,6 +20,18 @@ public class RightClickHandler
         // Reset charge when right click is released
         isCharging = false;
         chargeStart = 0;
+    }
+
+    public static void setTargetSlot(Slot slot) {
+        targetSlot = slot;
+    }
+
+    public static Slot getTargetSlot() {
+        return targetSlot;
+    }
+
+    public static int getTargetSlotID() {
+        return targetSlot.getIndex();
     }
 
     public static float getChargePercent() {

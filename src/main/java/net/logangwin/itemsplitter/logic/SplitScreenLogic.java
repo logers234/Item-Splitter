@@ -58,17 +58,17 @@ public class SplitScreenLogic {
         HandledScreenAccessor accessor = (HandledScreenAccessor) currentScreen;
 
         // Check if the target slot is part of the creative grid
-        boolean creativeSlot = ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), RightClickHandler.targetSlot);
+        boolean creativeSlot = ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), RightClickHandler.getTargetSlot());
 
         // Get the left and right edge of inventory
-        if (accessor != null && RightClickHandler.targetSlot != null) {
+        if (accessor != null && RightClickHandler.getTargetSlot() != null) {
 
             double ratio = getRatio((HandledScreenAccessor) currentScreen, client, accessor);
 
             // Update the slider and the current number of items to be picked up
             SplitScreen.updateSplitSlider(ratio);
             if (client.player.isCreative() && creativeSlot) {
-                setSplitAmount(Math.round((float) (RightClickHandler.targetSlot.getStack().getMaxCount() * ratio)));
+                setSplitAmount(Math.round((float) (RightClickHandler.getTargetSlot().getStack().getMaxCount() * ratio)));
             }
             else {
                 setSplitAmount(Math.round((float) (maxSplit * ratio)));
@@ -79,7 +79,7 @@ public class SplitScreenLogic {
     private static double getRatio(HandledScreenAccessor currentScreen, MinecraftClient client, HandledScreenAccessor accessor) {
         // Calculate delta between target slot and mouse
         int guiLeft = currentScreen.getX();
-        int slotX = guiLeft + RightClickHandler.targetSlot.x + 8;
+        int slotX = guiLeft + RightClickHandler.getTargetSlot().x + 8;
         double deltaX = (client.mouse.getX() / client.getWindow().getScaleFactor()) - (double) slotX;
 
         // Calculate bounds
@@ -102,7 +102,7 @@ public class SplitScreenLogic {
         if (screen == null || client.interactionManager == null || targetSlot == null || client.player == null) return;
 
         int itemsInStack = targetSlot.getStack().getCount();
-        int slotId = RightClickHandler.targetSlotID;
+        int slotId = RightClickHandler.getTargetSlotID();
 
         // Use a different splitting process if player is in creative and within their own inventory
         if (client.player.isCreative() && screen.getScreenHandler().syncId == 0) {
