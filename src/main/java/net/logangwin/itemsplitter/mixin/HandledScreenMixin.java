@@ -41,14 +41,17 @@ public abstract class HandledScreenMixin extends Screen {
     private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
         // If the mouse button that was triggered was the right mouse button, block the vanilla behavior
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && client != null && client.player != null) {
+            assert ItemSplitterUtils.getCurrentScreen() != null;
+            if (ItemSplitterUtils.getCurrentScreen().getScreenHandler().getCursorStack().isEmpty()) {
 
-            // Start the timer, get the target slot and block the right click action
-            RightClickHandler.startCharging();
-            RightClickHandler.setTargetSlot(this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY));
+                // Start the timer, get the target slot and block the right click action
+                RightClickHandler.startCharging();
+                RightClickHandler.setTargetSlot(this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY));
 
-            RightClickHandler.actionTriggered = false;
-            cir.setReturnValue(true);
-            cir.cancel();
+                RightClickHandler.actionTriggered = false;
+                cir.setReturnValue(true);
+                cir.cancel();
+            }
         }
     }
 

@@ -16,19 +16,15 @@ public class ConfigScreen implements ConfigData {
         INSTANCE = AutoConfig.getConfigHolder(ConfigScreen.class).getConfig();
     }
 
-    @ConfigEntry.Category("General")
     @ConfigEntry.Gui.Tooltip()
     public boolean enableChargeCircle = true;
 
-    @ConfigEntry.Category("General")
     @ConfigEntry.Gui.Tooltip()
     public int timeDelay = 1000;
 
-    @ConfigEntry.Category("General")
     @ConfigEntry.Gui.Tooltip()
     public int splitCircleStartDelay = 100;
 
-    @ConfigEntry.Category("General")
     @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
     public IconState iconState = IconState.COLORED;
 
@@ -39,6 +35,10 @@ public class ConfigScreen implements ConfigData {
     @ConfigEntry.Category("Animations")
     @ConfigEntry.Gui.Tooltip()
     public int animationTime = 1000;
+
+    @ConfigEntry.Category("Animations")
+    @ConfigEntry.Gui.Tooltip()
+    public float startingOpacity = 0.3f;
 
     public enum IconState {
         MINIMAL,

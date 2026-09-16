@@ -3,5 +3,10 @@
   "text.autoconfig.itemsplitter.option.enableChargeCircle": "Enable Charge Circle",
   "text.autoconfig.itemsplitter.option.timeDelay": "Time Delay",
   "text.autoconfig.itemsplitter.option.splitCircleStartDelay": "Split Circle Start Delay",
-  "text.autoconfig.itemsplitter.option.iconState": "Icon Type"
+  "text.autoconfig.itemsplitter.option.iconState": "Icon Type",
+  "text.autoconfig.itemsplitter.option.enableAnimations": "Enable Animations",
+  "text.autoconfig.itemsplitter.option.animationTime": "Animation Fade In Time",
+  "text.autoconfig.itemsplitter.option.startingOpacity": "Animation Fade In Time",
+  "text.autoconfig.itemsplitter.category.default": "General",
+  "text.autoconfig.itemsplitter.category.Animations": "Animations"
 }
