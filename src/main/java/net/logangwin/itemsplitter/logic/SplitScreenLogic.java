@@ -1,6 +1,7 @@
 package net.logangwin.itemsplitter.logic;
 
 import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.mixin.HandledScreenAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -16,8 +17,11 @@ public class SplitScreenLogic {
     private static int splitAmount;
     private static final int minSplit = 0;
     private static int maxSplit = 0;
+    private static long animationStartTime = 0;
 
     public static void onScreenOpen(Slot targetSlot) {
+        animationStartTime = System.currentTimeMillis();
+
         if (targetSlot != null) {
             // Set initial split amount to half of target stack
             int itemCount = targetSlot.getStack().getCount();
@@ -227,5 +231,10 @@ public class SplitScreenLogic {
             // Set cursor locally
             screen.getScreenHandler().setCursorStack(stack);
         }
+    }
+
+    public static float getAnimationProgress() {
+        long timeSinceStart = System.currentTimeMillis() - animationStartTime;
+        return Math.min(((float) timeSinceStart / ConfigScreen.INSTANCE.animationTime), 1.0F);
     }
 }
