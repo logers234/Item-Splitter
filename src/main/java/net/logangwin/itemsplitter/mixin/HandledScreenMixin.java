@@ -8,7 +8,7 @@ import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleHud;
 import net.logangwin.itemsplitter.gui.SplitScreen;
-import net.logangwin.itemsplitter.logic.SplitScreenLogic;
+import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -78,25 +78,25 @@ public abstract class HandledScreenMixin extends Screen {
 
                 if (client.player.isCreative() && creativeSlot) {
                     ItemSplitter.LOGGER.info("Performing Creative Pickup Operation");
-                    SplitScreenLogic.creativePickupStack(RightClickHandler.getTargetSlot());
+                    SplitScreenHandler.creativePickupStack(RightClickHandler.getTargetSlot());
                 }
                 else {
                     ItemSplitter.LOGGER.info("Performing Standard Custom Split");
-                    SplitScreenLogic.splitStack(RightClickHandler.getTargetSlot());
+                    SplitScreenHandler.splitStack(RightClickHandler.getTargetSlot());
                 }
             }
             else {
                 // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
-                if (RightClickHandler.getTargetSlot() != null) {
+                if (RightClickHandler.validTargetSlot()) {
                     this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotID(), button, SlotActionType.PICKUP);
                 }
             }
 
             // Split screen should close if it was open
-            if (SplitScreenLogic.isScreenOpen()) {
+            if (SplitScreenHandler.isScreenOpen()) {
                 ItemSplitter.LOGGER.info("Closing screen");
-                SplitScreenLogic.onScreenClose();
+                SplitScreenHandler.onScreenClose();
                 RightClickHandler.setTargetSlot(null);
             }
 
@@ -110,7 +110,7 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "drawMouseoverTooltip", at = @At("HEAD"), cancellable = true)
     private void hideTooltipWhenCharging(DrawContext context, int x, int y, CallbackInfo ci) {
         // If right click is charging or the split screen is open, hide the current tooltip
-        if (RightClickHandler.isCharging() || SplitScreenLogic.isScreenOpen()) {
+        if (RightClickHandler.isCharging() || SplitScreenHandler.isScreenOpen()) {
             ci.cancel();
         }
     }
@@ -151,28 +151,38 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        if (RightClickHandler.isCharging() && RightClickHandler.getTargetSlot() != null && RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.getTargetSlot().hasStack()) {
+        boolean hasValidTarget = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().hasStack();
+        boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.isCharging();
+
+        if (hasValidTarget && (currentlyCharging || RightClickHandler.isFadingOut())) {
             // Get the charge percentage
             float progress = RightClickHandler.getChargePercent();
+            float alpha = getAlpha(progress);
 
             // Disable depth testing and push the charge circle to the front
             context.getMatrices().push();
             context.getMatrices().translate(0, 0, 500);
             RenderSystem.disableDepthTest();
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
 
             // Get slot coordinates and draw the circles
             int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
             int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
-            ChargeCircleHud.drawProgressRing(context, slotX, slotY, 4, 2, progress, 0xFFFFFFFF);
+            ChargeCircleHud.drawProgressRing(context, slotX, slotY, progress);
 
             // Reset the offset
+            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+            RenderSystem.disableBlend();
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
         }
 
-        if (SplitScreenLogic.isScreenOpen() && RightClickHandler.getTargetSlot() != null && RightClickHandler.getTargetSlot().getStack().getCount() > 0) {
+        boolean hasValidAmount = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().getStack().getCount() > 0;
+
+        if (SplitScreenHandler.isScreenOpen() && hasValidAmount) {
             // ---- Render Split Screen Tooltip ----
-            SplitScreenLogic.updateSplitSlider();
+            SplitScreenHandler.updateSplitSlider();
 
             // Disable depth testing and push the slider to the front
             context.getMatrices().push();
@@ -189,5 +199,26 @@ public abstract class HandledScreenMixin extends Screen {
             RenderSystem.enableDepthTest();
             context.getMatrices().pop();
         }
+    }
+
+    @Unique
+    private static float getAlpha(float progress) {
+        float alpha = 1.0f;
+
+        if (ConfigScreen.INSTANCE.enableAnimations) {
+            if (RightClickHandler.isCharging()) {
+                // Fade IN: 0.0 -> 1.0
+                float fadeInPercent = Math.min(progress, 1.0f);
+                alpha = ItemSplitterUtils.easeOutQuart(fadeInPercent);
+            } else if (RightClickHandler.isFadingOut()) {
+                // Fade OUT: 1.0 -> 0.0
+                float fadeOutPercent = RightClickHandler.getFadeOutPercent();
+                alpha = 1.0f - ItemSplitterUtils.easeOutQuart(fadeOutPercent);
+            } else {
+                // Hide when fade out is complete
+                alpha = 0.0f;
+            }
+        }
+        return alpha;
     }
 }

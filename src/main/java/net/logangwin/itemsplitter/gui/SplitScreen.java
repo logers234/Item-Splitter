@@ -2,7 +2,7 @@ package net.logangwin.itemsplitter.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
-import net.logangwin.itemsplitter.logic.SplitScreenLogic;
+import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
@@ -53,8 +53,8 @@ public class SplitScreen {
         float alpha = 1.0f;
 
         if (ConfigScreen.INSTANCE.enableAnimations) {
-            float animProgress = SplitScreenLogic.getAnimationProgress();
-            renderOffsetY = 10 * (1.0f - easeOutExpo(animProgress));
+            float animProgress = SplitScreenHandler.getAnimationProgress();
+            renderOffsetY = 10 * (1.0f - ItemSplitterUtils.easeOutExpo(animProgress));
             alpha = Math.min(2.0f * animProgress + ConfigScreen.INSTANCE.startingOpacity, 1.0f);
         }
 
@@ -82,9 +82,5 @@ public class SplitScreen {
         } else {
             SplitScreen.progress = progress;
         }
-    }
-
-    private static float easeOutExpo(float x) {
-        return x == 1 ? 1 : 1 - (float) (Math.pow(2, -10 * x));
     }
 }

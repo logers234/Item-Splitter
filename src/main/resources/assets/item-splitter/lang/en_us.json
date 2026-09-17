@@ -6,7 +6,7 @@
   "text.autoconfig.itemsplitter.option.iconState": "Icon Type",
   "text.autoconfig.itemsplitter.option.enableAnimations": "Enable Animations",
   "text.autoconfig.itemsplitter.option.animationTime": "Animation Fade In Time",
-  "text.autoconfig.itemsplitter.option.startingOpacity": "Animation Fade In Time",
+  "text.autoconfig.itemsplitter.option.startingOpacity": "Split Screen Starting Opacity",
   "text.autoconfig.itemsplitter.category.default": "General",
   "text.autoconfig.itemsplitter.category.Animations": "Animations"
 }

@@ -11,7 +11,7 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
 
-public class SplitScreenLogic {
+public class SplitScreenHandler {
 
     private static boolean isOpen = false;
     private static int splitAmount;
@@ -65,7 +65,7 @@ public class SplitScreenLogic {
         boolean creativeSlot = ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), RightClickHandler.getTargetSlot());
 
         // Get the left and right edge of inventory
-        if (accessor != null && RightClickHandler.getTargetSlot() != null) {
+        if (accessor != null && RightClickHandler.validTargetSlot()) {
 
             double ratio = getRatio((HandledScreenAccessor) currentScreen, client, accessor);
 

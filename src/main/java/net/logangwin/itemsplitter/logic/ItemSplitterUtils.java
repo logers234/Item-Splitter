@@ -78,4 +78,12 @@ public class ItemSplitterUtils {
         }
         return 0; // Fallback if the file not found
     }
+
+    public static float easeOutExpo(float x) {
+        return x == 1 ? 1 : 1 - (float) (Math.pow(2, -10 * x));
+    }
+
+    public static float easeOutQuart(float x) {
+        return 1.0f - (float) Math.pow(1 - x, 4);
+    }
 }

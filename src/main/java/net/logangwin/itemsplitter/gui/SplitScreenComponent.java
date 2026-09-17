@@ -3,7 +3,7 @@ package net.logangwin.itemsplitter.gui;
 import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.widget.SplitBar;
 import net.logangwin.itemsplitter.gui.widget.ItemIndicator;
-import net.logangwin.itemsplitter.logic.SplitScreenLogic;
+import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.tooltip.TooltipComponent;
@@ -49,10 +49,10 @@ public class SplitScreenComponent implements TooltipComponent {
 
     @Override
     public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
-        int currentItems = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
+        int currentItems = Math.round((float) (SplitScreenHandler.getMaxSplit() * progress));
 
         // Draw drop indicator
-        dropIndicator.drawIndicator(textRenderer, context, x, y, SplitScreenLogic.getMaxSplit() - currentItems);
+        dropIndicator.drawIndicator(textRenderer, context, x, y, SplitScreenHandler.getMaxSplit() - currentItems);
 
         // Draw split bar
         int splitBarX = x + dropIndicator.getWidth() + (barPadding / 2);

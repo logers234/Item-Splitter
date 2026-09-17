@@ -7,6 +7,7 @@ public class RightClickHandler
 {
     private static boolean isCharging = false;
     private static long chargeStart = 0;
+    private static long chargeStop = 0;
     private static Slot targetSlot = null;
     public static boolean actionTriggered = false;
 
@@ -19,7 +20,7 @@ public class RightClickHandler
     public static void stopCharging() {
         // Reset charge when right click is released
         isCharging = false;
-        chargeStart = 0;
+        chargeStop = System.currentTimeMillis();
     }
 
     public static void setTargetSlot(Slot slot) {
@@ -32,6 +33,22 @@ public class RightClickHandler
 
     public static int getTargetSlotID() {
         return targetSlot.getIndex();
+    }
+
+    public static boolean validTargetSlot() {
+        return (targetSlot != null);
+    }
+
+    public static boolean isFadingOut() {
+        return (System.currentTimeMillis() - chargeStop) < ConfigScreen.INSTANCE.animationTime;
+    }
+
+    public static float getFadeOutPercent() {
+        if (ConfigScreen.INSTANCE.animationTime <= 0) return 1.0f;
+
+        float elapsed = (float) (System.currentTimeMillis() - chargeStop);
+        float percent = elapsed / ConfigScreen.INSTANCE.animationTime;
+        return Math.min(Math.max(percent, 0.0f), 1.0f);
     }
 
     public static float getChargePercent() {
@@ -66,7 +83,7 @@ public class RightClickHandler
 
             // If the charge threshold is reached, open the split screen
             try {
-                SplitScreenLogic.onScreenOpen(targetSlot);
+                SplitScreenHandler.onScreenOpen(targetSlot);
             } catch (Exception e) {
                 throw new NullPointerException("Target slot is null");
             }

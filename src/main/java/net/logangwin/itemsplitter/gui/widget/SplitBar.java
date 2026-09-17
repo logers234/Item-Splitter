@@ -1,6 +1,6 @@
 package net.logangwin.itemsplitter.gui.widget;
 
-import net.logangwin.itemsplitter.logic.SplitScreenLogic;
+import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 
 public class SplitBar {
@@ -24,8 +24,8 @@ public class SplitBar {
     }
 
     public void drawSplitBar(DrawContext context, double progress, int x, int y) {
-        int currentItems = Math.round((float) (SplitScreenLogic.getMaxSplit() * progress));
-        this.drawSplitBar(context, currentItems, SplitScreenLogic.getMaxSplit(), x, y);
+        int currentItems = Math.round((float) (SplitScreenHandler.getMaxSplit() * progress));
+        this.drawSplitBar(context, currentItems, SplitScreenHandler.getMaxSplit(), x, y);
     }
 
     public void drawSplitBar(DrawContext context, int currentItems, int maxSplit, int x, int y) {
