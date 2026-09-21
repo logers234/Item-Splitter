@@ -9,7 +9,6 @@ public class RightClickHandler
     private static long chargeStart = 0;
     private static long chargeStop = 0;
     private static Slot targetSlot = null;
-    public static boolean actionTriggered = false;
 
     public static void startCharging() {
         // Begin charge when right click is held

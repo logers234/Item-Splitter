@@ -1,12 +1,19 @@
 {
   "text.autoconfig.itemsplitter.title": "Item Splitter",
   "text.autoconfig.itemsplitter.option.enableChargeCircle": "Enable Charge Circle",
+  "text.autoconfig.itemsplitter.option.enableChargeCircle.@Tooltip": "If true, the charge circle will be rendered",
   "text.autoconfig.itemsplitter.option.timeDelay": "Time Delay",
+  "text.autoconfig.itemsplitter.option.timeDelay.@Tooltip": "Determines how long it takes to open the split screen",
   "text.autoconfig.itemsplitter.option.splitCircleStartDelay": "Split Circle Start Delay",
+  "text.autoconfig.itemsplitter.option.splitCircleStartDelay.@Tooltip": "Determines how long it takes for the charge circle to appear",
   "text.autoconfig.itemsplitter.option.iconState": "Icon Type",
+  "text.autoconfig.itemsplitter.option.iconState.@Tooltip": "Determines which icon will render in the split screen",
   "text.autoconfig.itemsplitter.option.enableAnimations": "Enable Animations",
+  "text.autoconfig.itemsplitter.option.enableAnimations.@Tooltip": "If true, enables the fade in/fade out animations",
   "text.autoconfig.itemsplitter.option.animationTime": "Animation Fade In Time",
+  "text.autoconfig.itemsplitter.option.animationTime.@Tooltip": "Determines how long it takes for the GUI to fade in/out",
   "text.autoconfig.itemsplitter.option.startingOpacity": "Split Screen Starting Opacity",
+  "text.autoconfig.itemsplitter.option.startingOpacity.@Tooltip": "Determines how visible the splitscreen is at the beginning of the animation (1.0 = fully opaque, 0.0 = fully transparent)",
   "text.autoconfig.itemsplitter.category.default": "General",
   "text.autoconfig.itemsplitter.category.Animations": "Animations"
 }

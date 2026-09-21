@@ -8,7 +8,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.resource.Resource;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.*;
 import net.minecraft.util.Identifier;
 
 import java.io.InputStream;
@@ -32,6 +32,21 @@ public class ItemSplitterUtils {
         }
 
         return false;
+    }
+
+    public static boolean isOutputSlot(Slot slot) {
+        return slot instanceof CrafterOutputSlot
+                || slot instanceof CraftingResultSlot
+                || slot instanceof FurnaceOutputSlot
+                || slot instanceof TradeOutputSlot;
+    }
+
+    public static boolean cursorStackEmpty() {
+        if (getCurrentScreen() != null) {
+            return getCurrentScreen().getScreenHandler().getCursorStack().isEmpty();
+        }
+
+        return true;
     }
 
     public static HandledScreen<?> getCurrentScreen() {
