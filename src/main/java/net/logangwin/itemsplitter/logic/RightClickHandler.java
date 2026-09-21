@@ -6,6 +6,7 @@ import net.minecraft.screen.slot.Slot;
 public class RightClickHandler
 {
     private static boolean isCharging = false;
+    private static boolean wasFullyCharged = true;
     private static long chargeStart = 0;
     private static long chargeStop = 0;
     private static Slot targetSlot = null;
@@ -13,6 +14,7 @@ public class RightClickHandler
     public static void startCharging() {
         // Begin charge when right click is held
         isCharging = true;
+        wasFullyCharged = false;
         chargeStart = System.currentTimeMillis();
     }
 
@@ -20,6 +22,10 @@ public class RightClickHandler
         // Reset charge when right click is released
         isCharging = false;
         chargeStop = System.currentTimeMillis();
+
+        if (getChargePercent() >= 1.0f) {
+            wasFullyCharged = true;
+        }
     }
 
     public static void setTargetSlot(Slot slot) {
@@ -43,6 +49,7 @@ public class RightClickHandler
     }
 
     public static boolean isFadingOut() {
+        if (!wasFullyCharged) { return false; }
         return (System.currentTimeMillis() - chargeStop) < ConfigScreen.INSTANCE.animationTime;
     }
 

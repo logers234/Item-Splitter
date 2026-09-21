@@ -12,7 +12,6 @@ import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.item.Item;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.lwjgl.glfw.GLFW;
@@ -151,9 +150,9 @@ public abstract class HandledScreenMixin extends Screen {
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         boolean hasValidTarget = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().hasStack();
         boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.isCharging();
-        boolean showCircle = currentlyCharging || RightClickHandler.isFadingOut();
+        boolean showCircle = ConfigScreen.INSTANCE.enableChargeCircle && (currentlyCharging || RightClickHandler.isFadingOut());
 
-        if (ConfigScreen.INSTANCE.enableChargeCircle && hasValidTarget && showCircle) {
+        if (hasValidTarget && showCircle) {
             // Get the charge percentage
             float progress = RightClickHandler.getChargePercent();
             float alpha = getAlpha(progress);
