@@ -31,8 +31,12 @@ public class RightClickHandler
         return targetSlot;
     }
 
-    public static int getTargetSlotID() {
+    public static int getTargetSlotIndex() {
         return targetSlot.getIndex();
+    }
+
+    public static int getTargetSlotID() {
+        return targetSlot.id;
     }
 
     public static boolean validTargetSlot() {

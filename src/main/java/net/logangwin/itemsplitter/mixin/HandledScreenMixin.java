@@ -53,6 +53,11 @@ public abstract class HandledScreenMixin extends Screen {
                 cir.cancel();
             }
         }
+
+        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && SplitScreenHandler.isScreenOpen()) {
+            cir.setReturnValue(true);
+            cir.cancel();
+        }
     }
 
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
@@ -89,7 +94,7 @@ public abstract class HandledScreenMixin extends Screen {
                 // User released too quickly - Perform Vanilla Right Click
                 ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.validTargetSlot()) {
-                    this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotID(), button, SlotActionType.PICKUP);
+                    this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotIndex(), button, SlotActionType.PICKUP);
                 }
             }
 
