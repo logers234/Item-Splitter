@@ -11,8 +11,10 @@ import net.minecraft.util.Identifier;
 public class ItemSplitterClient implements ClientModInitializer {
 
     private static Icon pickupIconMinimal;
+    private static Icon pickupIconWhite;
     private static Icon pickupIconColor;
     private static Icon dropIconMinimal;
+    private static Icon dropIconWhite;
     private static Icon dropIconColor;
 
     @Override
@@ -25,8 +27,10 @@ public class ItemSplitterClient implements ClientModInitializer {
 
         // Load icons
         pickupIconMinimal = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_minimal.png"));
+        pickupIconWhite = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_white.png"));
         pickupIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/pickup_icon_color.png"));
         dropIconMinimal = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_minimal.png"));
+        dropIconWhite = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_white.png"));
         dropIconColor = new Icon(Identifier.of("item-splitter", "textures/gui/icon/drop_icon_color.png"));
 
         // Initialize config screen
@@ -43,7 +47,7 @@ public class ItemSplitterClient implements ClientModInitializer {
         // Determine which icon type is currently selected
         switch (iconState) {
             case MINIMAL -> { return pickupIconMinimal; }
-            case WHITE -> { return pickupIconColor; }
+            case WHITE -> { return pickupIconWhite; }
             default -> { return pickupIconColor; }
         }
     }
@@ -54,8 +58,8 @@ public class ItemSplitterClient implements ClientModInitializer {
         // Determine which icon type is currently selected
         switch (iconState) {
             case MINIMAL -> { return dropIconMinimal; }
-            case WHITE -> { return dropIconColor; }
-            default -> { return dropIconColor;}
+            case WHITE -> { return dropIconWhite; }
+            default -> { return dropIconColor; }
         }
     }
 }
