@@ -49,21 +49,21 @@ public class RightClickHandler
     }
 
     public static boolean isFadingOut() {
-        if (!wasFullyCharged) { return false; }
-        return (System.currentTimeMillis() - chargeStop) < ConfigScreen.INSTANCE.animationTime;
+        if (!(wasFullyCharged && ConfigScreen.AnimationSettings.enableAnimations)) { return false; }
+        return (System.currentTimeMillis() - chargeStop) < ConfigScreen.AnimationSettings.animationTime;
     }
 
     public static float getFadeOutPercent() {
-        if (ConfigScreen.INSTANCE.animationTime <= 0) return 1.0f;
+        if (ConfigScreen.AnimationSettings.animationTime <= 0) return 1.0f;
 
         float elapsed = (float) (System.currentTimeMillis() - chargeStop);
-        float percent = elapsed / ConfigScreen.INSTANCE.animationTime;
+        float percent = elapsed / ConfigScreen.AnimationSettings.animationTime;
         return Math.min(Math.max(percent, 0.0f), 1.0f);
     }
 
     public static float getChargePercent() {
         // Get the percentage of how far the charge is to the threshold
-        return (float) (System.currentTimeMillis() - chargeStart) / ConfigScreen.INSTANCE.timeDelay;
+        return (float) (System.currentTimeMillis() - chargeStart) / ConfigScreen.GeneralSettings.timeDelay;
     }
 
     public static boolean isCharging() {
@@ -78,7 +78,7 @@ public class RightClickHandler
 
     public static boolean checkIfReleasedEarly() {
         // If the mouse button is released before 1 second has passed, reset the timer and return true
-        if (isCharging && System.currentTimeMillis() - chargeStart < ConfigScreen.INSTANCE.timeDelay) {
+        if (isCharging && System.currentTimeMillis() - chargeStart < ConfigScreen.GeneralSettings.timeDelay) {
             stopCharging();
             return true;
         }
@@ -89,7 +89,7 @@ public class RightClickHandler
 
     public static void tick()
     {
-        if (isCharging && System.currentTimeMillis() - chargeStart > ConfigScreen.INSTANCE.timeDelay) {
+        if (isCharging && System.currentTimeMillis() - chargeStart > ConfigScreen.GeneralSettings.timeDelay) {
 
             // If the charge threshold is reached, open the split screen
             try {

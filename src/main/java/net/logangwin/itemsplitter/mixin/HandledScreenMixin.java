@@ -149,8 +149,8 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "render", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         boolean hasValidTarget = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().hasStack();
-        boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.INSTANCE.splitCircleStartDelay && RightClickHandler.isCharging();
-        boolean showCircle = ConfigScreen.INSTANCE.enableChargeCircle && (currentlyCharging || RightClickHandler.isFadingOut());
+        boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.GeneralSettings.splitCircleStartDelay && RightClickHandler.isCharging();
+        boolean showCircle = ConfigScreen.GeneralSettings.enableChargeCircle && (currentlyCharging || RightClickHandler.isFadingOut());
 
         if (hasValidTarget && showCircle) {
             // Get the charge percentage
@@ -200,7 +200,7 @@ public abstract class HandledScreenMixin extends Screen {
     private static float getAlpha(float progress) {
         float alpha = 1.0f;
 
-        if (ConfigScreen.INSTANCE.enableAnimations) {
+        if (ConfigScreen.AnimationSettings.enableAnimations) {
             if (RightClickHandler.isCharging()) {
                 // Fade IN: 0.0 -> 1.0
                 float fadeInPercent = Math.min(progress, 1.0f);

@@ -122,7 +122,7 @@ public class SplitScreenHandler {
                 targetSlot.setStack(remainingStack);
 
                 // Update the target slot leftover quantity
-                client.interactionManager.clickCreativeStack(remainingStack, targetSlot.getIndex());
+                client.interactionManager.clickCreativeStack(remainingStack, slotId);
             }
 
             return;
@@ -235,6 +235,6 @@ public class SplitScreenHandler {
 
     public static float getAnimationProgress() {
         long timeSinceStart = System.currentTimeMillis() - animationStartTime;
-        return Math.min(((float) timeSinceStart / ConfigScreen.INSTANCE.animationTime), 1.0F);
+        return Math.min(((float) timeSinceStart / ConfigScreen.AnimationSettings.animationTime), 1.0F);
     }
 }

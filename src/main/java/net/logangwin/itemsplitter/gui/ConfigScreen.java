@@ -16,29 +16,13 @@ public class ConfigScreen implements ConfigData {
         INSTANCE = AutoConfig.getConfigHolder(ConfigScreen.class).getConfig();
     }
 
-    @ConfigEntry.Gui.Tooltip()
-    public boolean enableChargeCircle = true;
+    @SuppressWarnings({"unused", "InstantiationOfUtilityClass"})
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public GeneralSettings generalSettings = new GeneralSettings();
 
-    @ConfigEntry.Gui.Tooltip()
-    public int timeDelay = 1000;
-
-    @ConfigEntry.Gui.Tooltip()
-    public int splitCircleStartDelay = 100;
-
-    @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
-    public IconState iconState = IconState.COLORED;
-
-    @ConfigEntry.Category("Animations")
-    @ConfigEntry.Gui.Tooltip()
-    public boolean enableAnimations = true;
-
-    @ConfigEntry.Category("Animations")
-    @ConfigEntry.Gui.Tooltip()
-    public int animationTime = 1000;
-
-    @ConfigEntry.Category("Animations")
-    @ConfigEntry.Gui.Tooltip()
-    public float startingOpacity = 0.3f;
+    @SuppressWarnings({"unused", "InstantiationOfUtilityClass"})
+    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    public AnimationSettings animationSettings = new AnimationSettings();
 
     public enum IconState {
         MINIMAL,
@@ -46,6 +30,28 @@ public class ConfigScreen implements ConfigData {
         WHITE
     }
 
+    public static class GeneralSettings {
+        @ConfigEntry.Gui.Tooltip()
+        public static boolean enableChargeCircle = true;
 
+        @ConfigEntry.Gui.Tooltip()
+        public static int timeDelay = 1000;
 
+        @ConfigEntry.Gui.Tooltip()
+        public static int splitCircleStartDelay = 100;
+
+        @ConfigEntry.Gui.EnumHandler(option = ConfigEntry.Gui.EnumHandler.EnumDisplayOption.BUTTON)
+        public static IconState iconState = IconState.COLORED;
+    }
+
+    public static class AnimationSettings {
+        @ConfigEntry.Gui.Tooltip()
+        public static boolean enableAnimations = true;
+
+        @ConfigEntry.Gui.Tooltip()
+        public static int animationTime = 1000;
+
+        @ConfigEntry.Gui.Tooltip()
+        public static float startingOpacity = 0.3f;
+    }
 }

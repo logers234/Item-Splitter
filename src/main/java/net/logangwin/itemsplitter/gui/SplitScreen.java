@@ -52,10 +52,10 @@ public class SplitScreen {
         float renderOffsetY = 0;
         float alpha = 1.0f;
 
-        if (ConfigScreen.INSTANCE.enableAnimations) {
+        if (ConfigScreen.AnimationSettings.enableAnimations) {
             float animProgress = SplitScreenHandler.getAnimationProgress();
             renderOffsetY = 10 * (1.0f - ItemSplitterUtils.easeOutExpo(animProgress));
-            alpha = Math.min(2.0f * animProgress + ConfigScreen.INSTANCE.startingOpacity, 1.0f);
+            alpha = Math.min(2.0f * animProgress + ConfigScreen.AnimationSettings.startingOpacity, 1.0f);
         }
 
         // Render the tooltip

@@ -42,7 +42,7 @@ public class ItemSplitterClient implements ClientModInitializer {
     }
 
     public static Icon getCurrentPickupIcon() {
-        ConfigScreen.IconState iconState = ConfigScreen.INSTANCE.iconState;
+        ConfigScreen.IconState iconState = ConfigScreen.GeneralSettings.iconState;
 
         // Determine which icon type is currently selected
         switch (iconState) {
@@ -53,7 +53,7 @@ public class ItemSplitterClient implements ClientModInitializer {
     }
 
     public static Icon getCurrentDropIcon() {
-        ConfigScreen.IconState iconState = ConfigScreen.INSTANCE.iconState;
+        ConfigScreen.IconState iconState = ConfigScreen.GeneralSettings.iconState;
 
         // Determine which icon type is currently selected
         switch (iconState) {
