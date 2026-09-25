@@ -15,17 +15,11 @@
 	"icon": "assets/item-splitter/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"net.logangwin.itemsplitter.ItemSplitter"
-		],
-		"fabric-datagen": [
-			"net.logangwin.itemsplitter.ItemSplitterDataGenerator"
-		],
 		"client": [
 			"net.logangwin.itemsplitter.ItemSplitterClient"
 		],
 		"modmenu": [
-			"net.logangwin.itemsplitter.gui.ItemSplitterModMenu"
+			"net.logangwin.itemsplitter.ItemSplitterModMenu"
 		]
 	},
 	"mixins": [

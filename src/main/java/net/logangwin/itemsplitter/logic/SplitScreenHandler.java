@@ -1,6 +1,6 @@
 package net.logangwin.itemsplitter.logic;
 
-import net.logangwin.itemsplitter.ItemSplitter;
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.mixin.HandledScreenAccessor;
@@ -183,7 +183,7 @@ public class SplitScreenHandler {
                     );
                 }
                 else {
-                    ItemSplitter.LOGGER.warn("Cursor is empty!");
+                    ItemSplitterClient.LOGGER.warn("Cursor is empty!");
                 }
             }
         }

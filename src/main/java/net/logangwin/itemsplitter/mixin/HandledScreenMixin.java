@@ -2,7 +2,6 @@ package net.logangwin.itemsplitter.mixin;
 
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.logangwin.itemsplitter.ItemSplitter;
 import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
@@ -45,7 +44,6 @@ public abstract class HandledScreenMixin extends Screen {
         // If the mouse button that was triggered was the right mouse button, block the vanilla behavior
         if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && validScreen && !ItemSplitterUtils.isOutputSlot(slot)) {
             if (ItemSplitterUtils.cursorStackEmpty()) {
-                ItemSplitter.LOGGER.info("charge");
                 // Start the timer, get the target slot and block the right click action
                 RightClickHandler.startCharging();
                 RightClickHandler.setTargetSlot(slot);
@@ -74,17 +72,14 @@ public abstract class HandledScreenMixin extends Screen {
                 boolean creativeSlot = ItemSplitterUtils.isCreativeSlot((HandledScreen<?>) (Object) this, RightClickHandler.getTargetSlot());
 
                 if (client.player.isCreative() && creativeSlot) {
-                    ItemSplitter.LOGGER.info("Performing Creative Pickup Operation");
                     SplitScreenHandler.creativePickupStack(RightClickHandler.getTargetSlot());
                 }
                 else {
-                    ItemSplitter.LOGGER.info("Performing Standard Custom Split");
                     SplitScreenHandler.splitStack(RightClickHandler.getTargetSlot());
                 }
             }
             else {
                 // User released too quickly - Perform Vanilla Right Click
-                ItemSplitter.LOGGER.info("Released early, performing vanilla pickup");
                 if (RightClickHandler.validTargetSlot()) {
                     this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotIndex(), button, SlotActionType.PICKUP);
                 }
@@ -92,7 +87,6 @@ public abstract class HandledScreenMixin extends Screen {
 
             // Split screen should close if it was open
             if (SplitScreenHandler.isScreenOpen()) {
-                ItemSplitter.LOGGER.info("Closing screen");
                 SplitScreenHandler.onScreenClose();
                 RightClickHandler.setTargetSlot(null);
             }

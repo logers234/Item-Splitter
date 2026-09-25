@@ -7,8 +7,13 @@ import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.gui.widget.Icon;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.minecraft.util.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ItemSplitterClient implements ClientModInitializer {
+
+    public static final String MOD_ID = "item-splitter";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     private static Icon pickupIconMinimal;
     private static Icon pickupIconWhite;
