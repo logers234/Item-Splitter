@@ -46,16 +46,16 @@ public class ItemIndicator {
         int textY = iconCenterY - (textRenderer.fontHeight / 2);
 
         // Setup scale
-        context.getMatrices().push();
-        context.getMatrices().translate(x, y, 0);
-        context.getMatrices().scale(this.indicatorScale, this.indicatorScale, 1.0f);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate(x, y);
+        context.getMatrices().scale(this.indicatorScale, this.indicatorScale);
 
         // Draw icon and text
         icon.drawIcon(context, 0, 0);
         context.drawText(textRenderer, text, textX, textY, 0xFFFFFFFF, false);
 
         // Reset stack
-        context.getMatrices().pop();
+        context.getMatrices().popMatrix();
 
     }
 }

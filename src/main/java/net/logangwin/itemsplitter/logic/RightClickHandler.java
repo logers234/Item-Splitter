@@ -1,5 +1,6 @@
 package net.logangwin.itemsplitter.logic;
 
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.minecraft.screen.slot.Slot;
 
@@ -90,7 +91,7 @@ public class RightClickHandler
     public static void tick()
     {
         if (isCharging && System.currentTimeMillis() - chargeStart > ConfigScreen.GeneralSettings.timeDelay) {
-
+            ItemSplitterClient.LOGGER.info("finish charging");
             // If the charge threshold is reached, open the split screen
             try {
                 SplitScreenHandler.onScreenOpen(targetSlot);

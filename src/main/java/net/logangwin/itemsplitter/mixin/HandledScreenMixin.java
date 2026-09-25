@@ -1,18 +1,20 @@
 package net.logangwin.itemsplitter.mixin;
 
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleHud;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.logic.SplitScreenHandler;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -31,18 +33,19 @@ public abstract class HandledScreenMixin extends Screen {
     @Shadow
     protected abstract void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType);
 
+    @Shadow @Nullable protected Slot focusedSlot;
+
     @SuppressWarnings("unused")
     public HandledScreenMixin() {
         super(null);
     }
 
     @Inject(method = "mouseClicked", at = @At("HEAD"), cancellable = true)
-    private void onMouseClicked(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
+    private void onMouseClicked(Click click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {
         boolean validScreen = client != null && client.player != null && ItemSplitterUtils.getCurrentScreen() != null;
-        Slot slot = this.getSlotUnderMouse((HandledScreen<?>) (Object) this, mouseX, mouseY);
-
+        Slot slot = this.focusedSlot;
         // If the mouse button that was triggered was the right mouse button, block the vanilla behavior
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && validScreen && !ItemSplitterUtils.isOutputSlot(slot)) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && validScreen && !ItemSplitterUtils.isOutputSlot(slot)) {
             if (ItemSplitterUtils.cursorStackEmpty()) {
                 // Start the timer, get the target slot and block the right click action
                 RightClickHandler.startCharging();
@@ -53,15 +56,15 @@ public abstract class HandledScreenMixin extends Screen {
         }
 
         // Block player from picking up stacks while in the split screen
-        if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT && SplitScreenHandler.isScreenOpen()) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_LEFT && SplitScreenHandler.isScreenOpen()) {
             cir.setReturnValue(true);
             cir.cancel();
         }
     }
 
     @Inject(method = "mouseReleased", at = @At("HEAD"), cancellable = true)
-    private void onMouseReleased(double mouseX, double mouseY, int button, CallbackInfoReturnable<Boolean> cir) {
-        if (button == GLFW.GLFW_MOUSE_BUTTON_RIGHT && client != null && client.player != null && ItemSplitterUtils.cursorStackEmpty()) {
+    private void onMouseReleased(Click click, CallbackInfoReturnable<Boolean> cir) {
+        if (click.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT && client != null && client.player != null && ItemSplitterUtils.cursorStackEmpty()) {
 
             // Check if it's too early for the custom split
             boolean releasedEarly = RightClickHandler.checkIfReleasedEarly();
@@ -81,7 +84,7 @@ public abstract class HandledScreenMixin extends Screen {
             else {
                 // User released too quickly - Perform Vanilla Right Click
                 if (RightClickHandler.validTargetSlot()) {
-                    this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotIndex(), button, SlotActionType.PICKUP);
+                    this.onMouseClick(RightClickHandler.getTargetSlot(), RightClickHandler.getTargetSlotIndex(), click.button(), SlotActionType.PICKUP);
                 }
             }
 
@@ -107,30 +110,6 @@ public abstract class HandledScreenMixin extends Screen {
     }
 
     @Unique
-    private boolean isPointOverSlot(Slot slot, double mouseX, double mouseY) {
-        // Check if a given slot is under the mouse
-        int slotX = this.x + slot.x;
-        int slotY = this.y + slot.y;
-        return mouseX >= slotX && mouseX < slotX + 16 &&
-                mouseY >= slotY && mouseY < slotY + 16;
-    }
-
-    @Unique
-    private Slot getSlotUnderMouse(HandledScreen<?> screen, double mouseX, double mouseY) {
-        // Find the slot the mouse is currently over
-        for (int i = 0; i < screen.getScreenHandler().slots.size(); i++) {
-            Slot slot = screen.getScreenHandler().slots.get(i);
-            if (isPointOverSlot(slot, mouseX, mouseY) && slot.isEnabled()) {
-                // Return the slot
-                return slot;
-            }
-        }
-
-        // Return null if a slot wasn't found
-        return null;
-    }
-
-    @Unique
     public int getItemSlotX(Slot slot) {
         return ((HandledScreenAccessor) this).getX() + slot.x + 8;
     }
@@ -140,7 +119,7 @@ public abstract class HandledScreenMixin extends Screen {
         return ((HandledScreenAccessor) this).getY() + slot.y + 8;
     }
 
-    @Inject(method = "render", at = @At("TAIL"))
+    @Inject(method = "renderMain", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         boolean hasValidTarget = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().hasStack();
         boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.GeneralSettings.splitCircleStartDelay && RightClickHandler.isCharging();
@@ -152,21 +131,14 @@ public abstract class HandledScreenMixin extends Screen {
             float alpha = getAlpha(progress);
 
             // Disable depth testing and push the charge circle to the front
-            context.getMatrices().push();
-            context.getMatrices().translate(0, 0, 500);
-            RenderSystem.disableDepthTest();
-            RenderSystem.enableBlend();
-            RenderSystem.setShaderColor(1f, 1f, 1f, alpha);
+            context.getMatrices().pushMatrix();
 
             int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
             int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
-            ChargeCircleHud.drawProgressRing(context, slotX, slotY, progress);
+            ChargeCircleHud.drawProgressRing(context, slotX, slotY, progress, alpha);
 
             // Reset the offset
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-            RenderSystem.disableBlend();
-            RenderSystem.enableDepthTest();
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
         }
 
         boolean hasValidAmount = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().getStack().getCount() > 0;
@@ -176,8 +148,7 @@ public abstract class HandledScreenMixin extends Screen {
             SplitScreenHandler.updateSplitSlider();
 
             // Disable depth testing and push the slider to the front
-            context.getMatrices().push();
-            context.getMatrices().translate(0, 0, 550);
+            context.getMatrices().pushMatrix();
 
             // Draw tooltip
             int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
@@ -185,8 +156,7 @@ public abstract class HandledScreenMixin extends Screen {
             SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.getTargetSlot());
 
             // Reset the offset and re-enable depth testing
-            RenderSystem.enableDepthTest();
-            context.getMatrices().pop();
+            context.getMatrices().popMatrix();
         }
     }
 

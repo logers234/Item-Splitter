@@ -1,145 +1,87 @@
 package net.logangwin.itemsplitter.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
-import org.joml.Matrix4f;
 
 public class ChargeCircleHud {
 
-    public static void drawProgressRing(DrawContext context, int x, int y, float progress) {
+    public static void drawProgressRing(DrawContext context, int x, int y, float progress, float alpha) {
+        ItemSplitterClient.LOGGER.info("draw charge circle");
         int backgroundColor = 0xF0100010;
 
-        // The Trail fades from transparent/dim to bright white at the leading edge
-        int startColor = 0x00FFFFFF; // Fully transparent white at origin
-        int endColor = 0xFFFFFFFF;   // Fully opaque white at leading edge
-
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.disableDepthTest();
+        int startColor = ((int) (alpha * 255) << 24) | 0xFFFFFF;
+        int endColor = ((int) (alpha * 255) << 24) | 0xFFFFFF;
 
         drawCircle(context, x, y, 2.5F, 5.5F, 1F, backgroundColor);
-        drawGradientCircle(context, x, y, 3, 5, progress, startColor, endColor);
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        drawGradientCircle(context, x, y, 3F, 5F, progress, startColor, endColor);
     }
 
     private static void drawCircle(DrawContext context, int x, int y, float innerRadius, float outerRadius, float progress, int color) {
-        if (progress <= 0) return;
-        if (progress > 1F) {
-            progress = 1F;
-        }
-
-        // Extract color values (ARGB format)
-        float alpha = ((color >> 24) & 0xFF) / 255f;
-        float red = ((color >> 16) & 0xFF) / 255f;
-        float green = ((color >> 8) & 0xFF) / 255f;
-        float blue = (color & 0xFF) / 255f;
-
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-
-        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-
-        int segments = 60;
-        int endSegment = (int) (segments * progress);
-
-        for (int i = 0; i <= endSegment; i++) {
-            double angle = Math.toRadians((i * 360.0 / segments) - 90); // Start from the top
-            float dx = (float) Math.cos(angle);
-            float dy = (float) Math.sin(angle);
-
-            // Outer vertex
-            bufferBuilder.vertex(matrix, x + dx * outerRadius, y + dy * outerRadius, 0)
-                    .color(red, green, blue, alpha);
-            // Inner vertex
-            bufferBuilder.vertex(matrix, x + dx * innerRadius, y + dy * innerRadius, 0)
-                    .color(red, green, blue, alpha);
-        }
-
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+        drawGradientCircle(context, x, y, innerRadius, outerRadius, progress, color, color);
     }
 
     private static void drawGradientCircle(DrawContext context, int x, int y, float innerRadius, float outerRadius, float progress, int startColor, int endColor) {
-        if (progress <= 0) return;
-        if (progress > 1F) {
-            progress = 1F;
+        if (progress <= 0.0F) {
+            return;
         }
 
-        float startA = ((startColor >> 24) & 0xFF) / 255f;
-        float startR = ((startColor >> 16) & 0xFF) / 255f;
-        float startG = ((startColor >> 8) & 0xFF) / 255f;
-        float startB = (startColor & 0xFF) / 255f;
+        progress = Math.min(progress, 1.0F);
 
-        float endA = ((endColor >> 24) & 0xFF) / 255f;
-        float endR = ((endColor >> 16) & 0xFF) / 255f;
-        float endG = ((endColor >> 8) & 0xFF) / 255f;
-        float endB = (endColor & 0xFF) / 255f;
+        int segments = Math.max(24, (int) (outerRadius * 2.0F * Math.PI * progress));
 
-        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
+        for (int i = 0; i < segments; i++) {
+            float t1 = (float) i / segments;
+            float t2 = (float) (i + 1) / segments;
 
-        Matrix4f matrix = context.getMatrices().peek().getPositionMatrix();
-        Tessellator tessellator = Tessellator.getInstance();
+            float angle1 = t1 * progress * 2.0F * (float) Math.PI - (float) (Math.PI / 2.0);
+            float angle2 = t2 * progress * 2.0F * (float) Math.PI - (float) (Math.PI / 2.0);
 
-        int segments = 90;
-        int endSegment = (int) (segments * progress);
+            float midAngle = (angle1 + angle2) * 0.5F;
 
-        // 1. Draw the Main Arc Body
-        BufferBuilder bufferBuilder = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_STRIP, VertexFormats.POSITION_COLOR);
-        for (int i = 0; i <= endSegment; i++) {
-            float delta = endSegment > 0 ? (float) i / endSegment : 1.0f;
+            float cos = (float) Math.cos(midAngle);
+            float sin = (float) Math.sin(midAngle);
 
-            float r = startR + (endR - startR) * delta;
-            float g = startG + (endG - startG) * delta;
-            float b = startB + (endB - startB) * delta;
-            float a = startA + (endA - startA) * delta;
+            float radius = (innerRadius + outerRadius) * 0.5F;
+            float halfWidth = (outerRadius - innerRadius) * 0.5F;
 
-            double angle = Math.toRadians((i * 360.0 / segments) - 90);
-            float dx = (float) Math.cos(angle);
-            float dy = (float) Math.sin(angle);
+            float centerX = x + cos * radius;
+            float centerY = y + sin * radius;
 
-            bufferBuilder.vertex(matrix, x + dx * outerRadius, y + dy * outerRadius, 0).color(r, g, b, a);
-            bufferBuilder.vertex(matrix, x + dx * innerRadius, y + dy * innerRadius, 0).color(r, g, b, a);
+            float segmentLength = radius * (angle2 - angle1);
+
+            float left = centerX - segmentLength * 0.5F;
+            float top = centerY - halfWidth;
+            float right = centerX + segmentLength * 0.5F;
+            float bottom = centerY + halfWidth;
+
+            int color = interpolateColor(startColor, endColor, t1);
+
+            context.fill(
+                    (int) left,
+                    (int) top,
+                    (int) right + 1,
+                    (int) bottom + 1,
+                    color
+            );
         }
-        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
+    }
 
-        // 2. Draw Semicircle Cap on Leading Edge
-        if (endSegment > 0) {
-            double capAngle = Math.toRadians((endSegment * 360.0 / segments) - 90);
-            float capDx = (float) Math.cos(capAngle);
-            float capDy = (float) Math.sin(capAngle);
+    private static int interpolateColor(int startColor, int endColor, float progress) {
+        int a1 = (startColor >>> 24) & 0xFF;
+        int r1 = (startColor >>> 16) & 0xFF;
+        int g1 = (startColor >>> 8) & 0xFF;
+        int b1 = startColor & 0xFF;
 
-            // Center point of the cap ring section
-            float capRadius = (outerRadius - innerRadius) / 2.0f;
-            float midRadius = innerRadius + capRadius;
-            float capCenterX = x + capDx * midRadius;
-            float capCenterY = y + capDy * midRadius;
+        int a2 = (endColor >>> 24) & 0xFF;
+        int r2 = (endColor >>> 16) & 0xFF;
+        int g2 = (endColor >>> 8) & 0xFF;
+        int b2 = endColor & 0xFF;
 
-            // Tangent angle facing forward along the path
-            double forwardAngle = capAngle + Math.PI / 2.0;
+        int a = (int) (a1 + (a2 - a1) * progress);
+        int r = (int) (r1 + (r2 - r1) * progress);
+        int g = (int) (g1 + (g2 - g1) * progress);
+        int b = (int) (b1 + (b2 - b1) * progress);
 
-            BufferBuilder capBuffer = tessellator.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
-
-            // Fan center
-            capBuffer.vertex(matrix, capCenterX, capCenterY, 0).color(endR, endG, endB, endA);
-
-            // Sweep 180 degrees (+PI/2 to -PI/2 relative to forward vector)
-            int capSegments = 16;
-            for (int j = 0; j <= capSegments; j++) {
-                double offset = (Math.PI / 2.0) - (j * Math.PI / capSegments);
-                double arcAngle = forwardAngle + offset;
-
-                float vx = capCenterX + (float) Math.cos(arcAngle) * capRadius;
-                float vy = capCenterY + (float) Math.sin(arcAngle) * capRadius;
-
-                capBuffer.vertex(matrix, vx, vy, 0).color(endR, endG, endB, endA);
-            }
-            BufferRenderer.drawWithGlobalProgram(capBuffer.end());
-        }
-
-        RenderSystem.enableDepthTest();
-        RenderSystem.disableBlend();
+        return (a << 24) | (r << 16) | (g << 8) | b;
     }
 }

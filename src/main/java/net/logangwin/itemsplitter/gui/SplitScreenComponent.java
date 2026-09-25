@@ -37,7 +37,7 @@ public class SplitScreenComponent implements TooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(TextRenderer textRenderer) {
         int bottomPadding = 2;
         return height + bottomPadding;
     }
@@ -48,7 +48,7 @@ public class SplitScreenComponent implements TooltipComponent {
     }
 
     @Override
-    public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
+    public void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext context) {
         int currentItems = Math.round((float) (SplitScreenHandler.getMaxSplit() * progress));
 
         // Draw drop indicator

@@ -1,6 +1,7 @@
 package net.logangwin.itemsplitter.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
@@ -32,7 +33,7 @@ public class SplitScreen {
         if (client.player == null || targetSlot == null || !targetSlot.hasStack()) {
             return;
         }
-
+        ItemSplitterClient.LOGGER.info("draw tooltip");
         // Determine which component to use
         boolean isCreative = client.player.isCreative() && ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), targetSlot);
         ItemStack stack = targetSlot.getStack();
@@ -46,7 +47,7 @@ public class SplitScreen {
         // Offset the standard tooltip positioner and center it above the target slot
         TooltipComponent firstComponent = components.getFirst();
         int renderX = slotX - 12 - (firstComponent.getWidth(textRenderer) / 2);
-        int renderY = slotY - 10 - (firstComponent.getHeight() / 2);
+        int renderY = slotY - 10 - (firstComponent.getHeight(textRenderer) / 2);
 
         // Handle animations and opacity
         float renderOffsetY = 0;
@@ -59,17 +60,13 @@ public class SplitScreen {
         }
 
         // Render the tooltip
-        RenderSystem.enableBlend();
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, alpha);
-        context.getMatrices().push();
-        context.getMatrices().translate(renderX, renderY - renderOffsetY, 0);
+        context.getMatrices().pushMatrix();
+        context.getMatrices().translate(renderX, renderY - renderOffsetY);
 
-        ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, 0, 0, positioner);
+        ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, 0, 0, positioner, null, true);
 
         // Restore state
-        context.getMatrices().pop();
-        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
-        RenderSystem.disableBlend();
+        context.getMatrices().popMatrix();
         components.clear();
     }
 

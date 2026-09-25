@@ -35,7 +35,7 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
     }
 
     @Override
-    public int getHeight() {
+    public int getHeight(TextRenderer textRenderer) {
         int bottomPadding = 2;
         return height + bottomPadding;
     }
@@ -46,7 +46,7 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
     }
 
     @Override
-    public void drawItems(TextRenderer textRenderer, int x, int y, DrawContext context) {
+    public void drawItems(TextRenderer textRenderer, int x, int y, int width, int height, DrawContext context) {
         // Draw split bar
         int splitBarX = x + (barPadding / 2);
         int splitBarY = y + (height / 2) - (splitBar.getHeight() / 2);
