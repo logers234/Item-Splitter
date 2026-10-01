@@ -8,10 +8,13 @@ import net.logangwin.itemsplitter.logic.RightClickHandler;
 import net.logangwin.itemsplitter.gui.ChargeCircleHud;
 import net.logangwin.itemsplitter.gui.SplitScreen;
 import net.logangwin.itemsplitter.logic.SplitScreenHandler;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.GameRenderer;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.jetbrains.annotations.Nullable;
@@ -121,42 +124,30 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "renderMain", at = @At("TAIL"))
     private void onRender(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
-        boolean hasValidTarget = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().hasStack();
-        boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.GeneralSettings.splitCircleStartDelay && RightClickHandler.isCharging();
-        boolean showCircle = ConfigScreen.GeneralSettings.enableChargeCircle && (currentlyCharging || RightClickHandler.isFadingOut());
+        if (RightClickHandler.validTargetSlot()) {
+            boolean currentlyCharging = RightClickHandler.getChargeTime() > ConfigScreen.GeneralSettings.splitCircleStartDelay && RightClickHandler.isCharging();
+            boolean showCircle = ConfigScreen.GeneralSettings.enableChargeCircle && (currentlyCharging || RightClickHandler.isFadingOut());
 
-        if (hasValidTarget && showCircle) {
-            // Get the charge percentage
-            float progress = RightClickHandler.getChargePercent();
-            float alpha = getAlpha(progress);
+            if (RightClickHandler.getTargetSlot().hasStack() && showCircle) {
+                // Get the charge percentage
+                float progress = RightClickHandler.getChargePercent();
+                float alpha = getAlpha(progress);
 
-            // Disable depth testing and push the charge circle to the front
-            context.getMatrices().pushMatrix();
+                int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
+                int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
+                GameRendererMixin gameRenderer = (GameRendererMixin) MinecraftClient.getInstance().gameRenderer;
+                ChargeCircleHud.drawProgressRing(gameRenderer.getGuiState(), slotX, slotY, progress, alpha);
+            }
 
-            int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
-            int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
-            ChargeCircleHud.drawProgressRing(context, slotX, slotY, progress, alpha);
+            if (SplitScreenHandler.isScreenOpen() && RightClickHandler.getTargetSlot().getStack().getCount() > 0) {
+                // ---- Render Split Screen Tooltip ----
+                SplitScreenHandler.updateSplitSlider();
 
-            // Reset the offset
-            context.getMatrices().popMatrix();
-        }
-
-        boolean hasValidAmount = RightClickHandler.validTargetSlot() && RightClickHandler.getTargetSlot().getStack().getCount() > 0;
-
-        if (SplitScreenHandler.isScreenOpen() && hasValidAmount) {
-            // ---- Render Split Screen Tooltip ----
-            SplitScreenHandler.updateSplitSlider();
-
-            // Disable depth testing and push the slider to the front
-            context.getMatrices().pushMatrix();
-
-            // Draw tooltip
-            int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
-            int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
-            SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.getTargetSlot());
-
-            // Reset the offset and re-enable depth testing
-            context.getMatrices().popMatrix();
+                // Draw tooltip
+                int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
+                int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
+                SplitScreen.drawTooltip(context, this.textRenderer, slotX, slotY, RightClickHandler.getTargetSlot());
+            }
         }
     }
 

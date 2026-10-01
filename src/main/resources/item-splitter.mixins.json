@@ -5,7 +5,7 @@
   "client": [
     "HandledScreenAccessor",
     "HandledScreenMixin",
-    "DrawContextInvoker"
+    "GameRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

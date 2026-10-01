@@ -1,10 +1,8 @@
 package net.logangwin.itemsplitter.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.SplitScreenHandler;
-import net.logangwin.itemsplitter.mixin.DrawContextInvoker;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -33,7 +31,7 @@ public class SplitScreen {
         if (client.player == null || targetSlot == null || !targetSlot.hasStack()) {
             return;
         }
-        ItemSplitterClient.LOGGER.info("draw tooltip");
+
         // Determine which component to use
         boolean isCreative = client.player.isCreative() && ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), targetSlot);
         ItemStack stack = targetSlot.getStack();
@@ -63,7 +61,7 @@ public class SplitScreen {
         context.getMatrices().pushMatrix();
         context.getMatrices().translate(renderX, renderY - renderOffsetY);
 
-        ((DrawContextInvoker) context).itemsplitter$invokeComponentTooltip(textRenderer, components, 0, 0, positioner, null, true);
+        context.drawTooltipImmediately(textRenderer, components, 0, 0, positioner, null);
 
         // Restore state
         context.getMatrices().popMatrix();

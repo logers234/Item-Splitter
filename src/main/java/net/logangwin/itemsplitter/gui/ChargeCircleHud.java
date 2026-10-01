@@ -1,86 +1,119 @@
 package net.logangwin.itemsplitter.gui;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.logangwin.itemsplitter.ItemSplitterClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gl.RenderPipelines;
+import net.minecraft.client.gui.render.state.ColoredQuadGuiElementRenderState;
+import net.minecraft.client.gui.render.state.GuiRenderState;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.texture.TextureSetup;
+import org.joml.Matrix3x2f;
 
 public class ChargeCircleHud {
 
-    public static void drawProgressRing(DrawContext context, int x, int y, float progress, float alpha) {
-        ItemSplitterClient.LOGGER.info("draw charge circle");
-        int backgroundColor = 0xF0100010;
+    private static final RenderPipeline CIRCLE_PIPELINE =
+            RenderPipeline.builder(RenderPipelines.GUI_SNIPPET)
+            .withLocation("pipeline/item_splitter_circle")
+            .withVertexFormat(VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES).withCull(false)
+            .build();
+
+    public static void drawProgressRing(GuiRenderState guiRenderState, int x, int y, float progress, float alpha) {
 
         int startColor = ((int) (alpha * 255) << 24) | 0xFFFFFF;
         int endColor = ((int) (alpha * 255) << 24) | 0xFFFFFF;
+        int backgroundColor = ((int) (alpha * 255) << 24) | 0x100010;
 
-        drawCircle(context, x, y, 2.5F, 5.5F, 1F, backgroundColor);
-        drawGradientCircle(context, x, y, 3F, 5F, progress, startColor, endColor);
+        Matrix3x2f pose = new Matrix3x2f();
+        pose.translate(x, y);
+        guiRenderState.addSimpleElement(new ColoredQuadGuiElementRenderState(RenderPipelines.GUI, TextureSetup.empty(), pose, 1, 2, 3, 4, startColor, endColor, null));
+
+        drawCircle(guiRenderState, x, y, 2.5F, 5.5F, 1.0F, backgroundColor);
+        drawGradientCircle(guiRenderState, x, y, 3.0F, 5.0F, progress, startColor, endColor);
     }
 
-    private static void drawCircle(DrawContext context, int x, int y, float innerRadius, float outerRadius, float progress, int color) {
-        drawGradientCircle(context, x, y, innerRadius, outerRadius, progress, color, color);
+    private static void drawCircle(GuiRenderState guiRenderState, int x, int y, float innerRadius, float outerRadius, float progress, int color) {
+        drawGradientCircle(guiRenderState, x, y, innerRadius, outerRadius, progress, color, color);
     }
 
-    private static void drawGradientCircle(DrawContext context, int x, int y, float innerRadius, float outerRadius, float progress, int startColor, int endColor) {
+    private static void drawGradientCircle(GuiRenderState guiRenderState, int x, int y, float innerRadius, float outerRadius, float progress, int startColor, int endColor) {
         if (progress <= 0.0F) {
             return;
         }
 
         progress = Math.min(progress, 1.0F);
 
-        int segments = Math.max(24, (int) (outerRadius * 2.0F * Math.PI * progress));
+        int segments = Math.max(16, (int) (outerRadius * 2.0F));
+
+        float[] vertices = new float[segments * 6 * 2];
+        int[] colors = new int[segments * 6];
+
+        int vertexIndex = 0;
 
         for (int i = 0; i < segments; i++) {
             float t1 = (float) i / segments;
             float t2 = (float) (i + 1) / segments;
 
-            float angle1 = t1 * progress * 2.0F * (float) Math.PI - (float) (Math.PI / 2.0);
-            float angle2 = t2 * progress * 2.0F * (float) Math.PI - (float) (Math.PI / 2.0);
+            float angle1 = -((float) Math.PI / 2.0F) + t1 * progress * (float) (Math.PI * 2.0F);
+            float angle2 = -((float) Math.PI / 2.0F) + t2 * progress * (float) (Math.PI * 2.0F);
 
-            float midAngle = (angle1 + angle2) * 0.5F;
+            float cos1 = (float) Math.cos(angle1);
+            float sin1 = (float) Math.sin(angle1);
+            float cos2 = (float) Math.cos(angle2);
+            float sin2 = (float) Math.sin(angle2);
 
-            float cos = (float) Math.cos(midAngle);
-            float sin = (float) Math.sin(midAngle);
+            float outerX1 = x + cos1 * outerRadius;
+            float outerY1 = y + sin1 * outerRadius;
+            float outerX2 = x + cos2 * outerRadius;
+            float outerY2 = y + sin2 * outerRadius;
 
-            float radius = (innerRadius + outerRadius) * 0.5F;
-            float halfWidth = (outerRadius - innerRadius) * 0.5F;
+            float innerX1 = x + cos1 * innerRadius;
+            float innerY1 = y + sin1 * innerRadius;
+            float innerX2 = x + cos2 * innerRadius;
+            float innerY2 = y + sin2 * innerRadius;
 
-            float centerX = x + cos * radius;
-            float centerY = y + sin * radius;
+            int color1 = interpolateColor(startColor, endColor, t1);
+            int color2 = interpolateColor(startColor, endColor, t2);
 
-            float segmentLength = radius * (angle2 - angle1);
+            // Triangle 1
+            vertexIndex = addVertex(vertices, colors, vertexIndex, outerX1, outerY1, color1);
+            vertexIndex = addVertex(vertices, colors, vertexIndex, outerX2, outerY2, color2);
+            vertexIndex = addVertex(vertices, colors, vertexIndex, innerX1, innerY1, color1);
 
-            float left = centerX - segmentLength * 0.5F;
-            float top = centerY - halfWidth;
-            float right = centerX + segmentLength * 0.5F;
-            float bottom = centerY + halfWidth;
-
-            int color = interpolateColor(startColor, endColor, t1);
-
-            context.fill(
-                    (int) left,
-                    (int) top,
-                    (int) right + 1,
-                    (int) bottom + 1,
-                    color
-            );
+            // Triangle 2
+            vertexIndex = addVertex(vertices, colors, vertexIndex, outerX2, outerY2, color2);
+            vertexIndex = addVertex(vertices, colors, vertexIndex, innerX2, innerY2, color2);
+            vertexIndex = addVertex(vertices, colors, vertexIndex, innerX1, innerY1, color1);
         }
+
+        guiRenderState.addSimpleElement(new CircleGuiElementRenderState(CIRCLE_PIPELINE, TextureSetup.empty(), vertices, colors, null));
+    }
+
+    private static int addVertex(float[] vertices, int[] colors, int index, float x, float y, int color) {
+        vertices[index * 2] = x;
+        vertices[index * 2 + 1] = y;
+        colors[index] = color;
+
+        return index + 1;
     }
 
     private static int interpolateColor(int startColor, int endColor, float progress) {
-        int a1 = (startColor >>> 24) & 0xFF;
-        int r1 = (startColor >>> 16) & 0xFF;
-        int g1 = (startColor >>> 8) & 0xFF;
-        int b1 = startColor & 0xFF;
+        progress = Math.max(0.0F, Math.min(1.0F, progress));
 
-        int a2 = (endColor >>> 24) & 0xFF;
-        int r2 = (endColor >>> 16) & 0xFF;
-        int g2 = (endColor >>> 8) & 0xFF;
-        int b2 = endColor & 0xFF;
+        int startA = (startColor >>> 24) & 0xFF;
+        int startR = (startColor >>> 16) & 0xFF;
+        int startG = (startColor >>> 8) & 0xFF;
+        int startB = startColor & 0xFF;
 
-        int a = (int) (a1 + (a2 - a1) * progress);
-        int r = (int) (r1 + (r2 - r1) * progress);
-        int g = (int) (g1 + (g2 - g1) * progress);
-        int b = (int) (b1 + (b2 - b1) * progress);
+        int endA = (endColor >>> 24) & 0xFF;
+        int endR = (endColor >>> 16) & 0xFF;
+        int endG = (endColor >>> 8) & 0xFF;
+        int endB = endColor & 0xFF;
+
+        int a = (int) (startA + (endA - startA) * progress);
+        int r = (int) (startR + (endR - startR) * progress);
+        int g = (int) (startG + (endG - startG) * progress);
+        int b = (int) (startB + (endB - startB) * progress);
 
         return (a << 24) | (r << 16) | (g << 8) | b;
     }
