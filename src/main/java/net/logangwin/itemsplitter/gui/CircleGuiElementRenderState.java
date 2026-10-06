@@ -18,10 +18,16 @@ public record CircleGuiElementRenderState(RenderPipeline pipeline, TextureSetup 
 
     @Override
     public void setupVertices(VertexConsumer vertexConsumer) {
-        for (int i = 0; i < vertices.length / 2; i++) {
-            vertexConsumer
-                    .vertex(vertices[i * 2], vertices[i * 2 + 1], 0.0F)
-                    .color(colors[i]);
+        for (int i = 0; i < colors.length; i++) {
+            int color = colors[i];
+
+            float alpha = ((color >>> 24) & 0xFF) / 255.0F;
+            float red = ((color >>> 16) & 0xFF) / 255.0F;
+            float green = ((color >>> 8) & 0xFF) / 255.0F;
+            float blue = (color & 0xFF) / 255.0F;
+
+            vertexConsumer.vertex(vertices[i * 2], vertices[i * 2 + 1], 0.0F)
+                    .color(red, green, blue, alpha);
         }
     }
 
