@@ -9,12 +9,14 @@ public class ItemIndicator {
     private final int indicatorWidth;
     private final int indicatorHeight;
     private final float indicatorScale;
+    private final float alpha;
+    private final int TEXT_COLOR;
 
-    public ItemIndicator(TextRenderer textRenderer, Icon icon, int maxTextWidth, float indicatorScale) {
+    public ItemIndicator(TextRenderer textRenderer, Icon icon, int maxTextWidth, float indicatorScale, float alpha) {
         // Assign variables
         this.icon = icon;
         this.indicatorScale = indicatorScale;
-
+        this.alpha = alpha;
 
         // Determine the width of indicator
         this.indicatorWidth = (int) (Math.max(this.icon.getWidth(), maxTextWidth) * this.indicatorScale);
@@ -22,6 +24,9 @@ public class ItemIndicator {
         // Determine the height of the indicator
         this.indicatorHeight = (int) (Math.max(icon.getHeight(), textRenderer.fontHeight) * this.indicatorScale);
 
+        float textAlpha = Math.clamp(alpha, 0.0F, 1.0F);
+        int textAlphaBits = ((int) (textAlpha * 255.0F)) << 24;
+        this.TEXT_COLOR = textAlphaBits | 0xFFFFFF;
     }
 
     public int getHeight() {
@@ -51,8 +56,8 @@ public class ItemIndicator {
         context.getMatrices().scale(this.indicatorScale, this.indicatorScale);
 
         // Draw icon and text
-        icon.drawIcon(context, 0, 0);
-        context.drawText(textRenderer, text, textX, textY, 0xFFFFFFFF, false);
+        icon.drawIcon(context, 0, 0, alpha);
+        context.drawText(textRenderer, text, textX, textY, TEXT_COLOR, false);
 
         // Reset stack
         context.getMatrices().popMatrix();

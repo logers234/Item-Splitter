@@ -32,7 +32,10 @@ public class Icon {
         return this.height;
     }
 
-    public void drawIcon(DrawContext context, int x, int y) {
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, this.TEXTURE, x, y, 0, 0, this.width, this.height, this.width, this.height);
+    public void drawIcon(DrawContext context, int x, int y, float alpha) {
+        int alphaBits = (int)(alpha * 255.0f) & 0xFF;
+        int color = (alphaBits << 24) | 0xFFFFFF;
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, this.TEXTURE, x, y, 0, 0, this.width, this.height, this.width, this.height, color);
+
     }
 }

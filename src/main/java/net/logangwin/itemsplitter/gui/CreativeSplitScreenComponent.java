@@ -18,7 +18,7 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
     private final ItemIndicator pickupIndicator;
     private final SplitBar splitBar;
 
-    CreativeSplitScreenComponent(TextRenderer textRenderer, double progress, int maxCount) {
+    CreativeSplitScreenComponent(TextRenderer textRenderer, double progress, int maxCount, float alpha) {
         this.progress = progress;
         float indicatorScale = 1F;
 
@@ -26,8 +26,8 @@ public class CreativeSplitScreenComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(maxCount));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale);
-        this.splitBar = new SplitBar();
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale, alpha);
+        this.splitBar = new SplitBar(alpha);
 
         // Calculate tooltip dimensions
         this.width = this.pickupIndicator.getWidth() + this.splitBar.getWidth() + barPadding;

@@ -1,6 +1,5 @@
 package net.logangwin.itemsplitter.gui;
 
-import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.MinecraftClient;
@@ -36,17 +35,6 @@ public class SplitScreen {
         boolean isCreative = client.player.isCreative() && ItemSplitterUtils.isCreativeSlot(ItemSplitterUtils.getCurrentScreen(), targetSlot);
         ItemStack stack = targetSlot.getStack();
 
-        if (isCreative) {
-            components.add(new CreativeSplitScreenComponent(textRenderer, progress, stack.getMaxCount()));
-        } else {
-            components.add(new SplitScreenComponent(textRenderer, progress, stack.getCount()));
-        }
-
-        // Offset the standard tooltip positioner and center it above the target slot
-        TooltipComponent firstComponent = components.getFirst();
-        int renderX = slotX - 12 - (firstComponent.getWidth(textRenderer) / 2);
-        int renderY = slotY - 10 - (firstComponent.getHeight(textRenderer) / 2);
-
         // Handle animations and opacity
         float renderOffsetY = 0;
         float alpha = 1.0f;
@@ -56,6 +44,17 @@ public class SplitScreen {
             renderOffsetY = 10 * (1.0f - ItemSplitterUtils.easeOutExpo(animProgress));
             alpha = Math.min(2.0f * animProgress + ConfigScreen.AnimationSettings.startingOpacity, 1.0f);
         }
+
+        if (isCreative) {
+            components.add(new CreativeSplitScreenComponent(textRenderer, progress, stack.getMaxCount(), alpha));
+        } else {
+            components.add(new SplitScreenComponent(textRenderer, progress, stack.getCount(), alpha));
+        }
+
+        // Offset the standard tooltip positioner and center it above the target slot
+        TooltipComponent firstComponent = components.getFirst();
+        int renderX = slotX - 12 - (firstComponent.getWidth(textRenderer) / 2);
+        int renderY = slotY - 10 - (firstComponent.getHeight(textRenderer) / 2);
 
         // Render the tooltip
         context.getMatrices().pushMatrix();

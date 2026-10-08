@@ -3,9 +3,10 @@
   "package": "net.logangwin.itemsplitter.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
+    "GameRendererMixin",
     "HandledScreenAccessor",
     "HandledScreenMixin",
-    "GameRendererMixin"
+    "TooltipBackgroundRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

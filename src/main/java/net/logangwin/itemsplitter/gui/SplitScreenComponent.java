@@ -19,7 +19,7 @@ public class SplitScreenComponent implements TooltipComponent {
     private final ItemIndicator dropIndicator;
     private final SplitBar splitBar;
 
-    SplitScreenComponent(TextRenderer textRenderer, double progress, int stackSize) {
+    SplitScreenComponent(TextRenderer textRenderer, double progress, int stackSize, float alpha) {
         this.progress = progress;
         float indicatorScale = 1F;
 
@@ -27,9 +27,9 @@ public class SplitScreenComponent implements TooltipComponent {
         int maxTextWidth = textRenderer.getWidth(String.valueOf(stackSize));
 
         // Initialize widgets
-        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale);
-        this.dropIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentDropIcon(), maxTextWidth, indicatorScale);
-        this.splitBar = new SplitBar();
+        this.pickupIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentPickupIcon(), maxTextWidth, indicatorScale, alpha);
+        this.dropIndicator = new ItemIndicator(textRenderer, ItemSplitterClient.getCurrentDropIcon(), maxTextWidth, indicatorScale, alpha);
+        this.splitBar = new SplitBar(alpha);
 
         // Calculate tooltip dimensions
         this.width = this.pickupIndicator.getWidth() + this.dropIndicator.getWidth() + this.splitBar.getWidth() + barPadding;

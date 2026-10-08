@@ -9,10 +9,24 @@ public class SplitBar {
     private final int barWidth = 50;
     private final int thumbWidth;
     private final int thumbHeight;
+    private final int BORDER_COLOR_TOP;
+    private final int BORDER_COLOR_BOTTOM;
+    private final int SPLIT_BAR_BACKGROUND;
+    private final int SPLIT_BAR_FOREGROUND;
 
-    public SplitBar() {
+    public SplitBar(float alpha) {
         thumbWidth = 2;
         thumbHeight = barHeight * 2;
+
+        float borderAlpha = Math.clamp(alpha, 0.0F, 0.31F);
+        int borderAlphaBits = ((int) (borderAlpha * 255.0F)) << 24;
+        BORDER_COLOR_TOP = borderAlphaBits | 0x5000FF;
+        BORDER_COLOR_BOTTOM = borderAlphaBits | 0x28007F;
+
+        float barAlpha = Math.clamp(alpha, 0.0F, 1.0F);
+        int barAlphaBits = ((int) (barAlpha * 255.0F)) << 24;
+        SPLIT_BAR_BACKGROUND = barAlphaBits | 0x292929;
+        SPLIT_BAR_FOREGROUND = barAlphaBits | 0xFFFFFF;
     }
 
     public int getHeight() {
@@ -31,31 +45,32 @@ public class SplitBar {
     public void drawSplitBar(DrawContext context, int currentItems, int maxSplit, int x, int y) {
         // Calculate the width of split bar based on how many items are being split
         int progressWidth = (currentItems * barWidth) / maxSplit;
+        int thumbRadius = (thumbWidth / 2);
 
         // Draw border
         drawSplitBarBorder(context, x, y, progressWidth);
 
         // Background
-        context.fill(x + progressWidth, y, x + barWidth, y + barHeight, 0xFF292929);
+        int backgroundBarLength = Math.clamp(progressWidth + thumbRadius, 0, barWidth);
+        context.fill(x + backgroundBarLength, y, x + barWidth, y + barHeight, SPLIT_BAR_BACKGROUND);
 
         // Draw split bar
-        context.fill(x, y, x + progressWidth, y + barHeight, 0xFFFFFFFF);
+        int splitBarLength = Math.clamp(progressWidth - thumbRadius, 0, barWidth);
+        context.fill(x, y, x + splitBarLength, y + barHeight, SPLIT_BAR_FOREGROUND);
 
         // Draw split bar thumb
         context.fill(
-                x + progressWidth - (thumbWidth / 2),
+                x + progressWidth - thumbRadius,
                 y + (barHeight / 2) + (thumbHeight / 2),
-                x + progressWidth + (thumbWidth / 2),
+                x + progressWidth + thumbRadius,
                 y + (barHeight / 2) - (thumbHeight / 2),
-                0xFFFFFFFF
+                SPLIT_BAR_FOREGROUND
         );
     }
 
     private void drawSplitBarBorder(DrawContext context, int x, int y, int progressWidth) {
         // Shared variables
         int borderThickness = 1;
-        int BORDER_COLOR_TOP = 0x505000FF; // 31% opacity
-        int BORDER_COLOR_BOTTOM = 0x5028007F; // 31% opacity
 
         // ---- Vertical border shared variables ----
         int verticalBorderStartY = y - borderThickness;
