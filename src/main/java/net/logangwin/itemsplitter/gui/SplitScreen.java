@@ -15,14 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SplitScreen {
-    private static List<TooltipComponent> components;
+    private static final List<TooltipComponent> components = new ArrayList<>();
     private static final TooltipPositioner positioner = HoveredTooltipPositioner.INSTANCE;
     private static double progress = 0.5F;
-
-    public static void initialize() {
-        // Create space for slider to go
-        components = new ArrayList<>();
-    }
 
     public static void drawTooltip(DrawContext context, TextRenderer textRenderer, int slotX, int slotY, Slot targetSlot) {
         // Safety Checks

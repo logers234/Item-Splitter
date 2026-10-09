@@ -1,7 +1,6 @@
 package net.logangwin.itemsplitter.mixin;
 
 
-import net.logangwin.itemsplitter.ItemSplitterClient;
 import net.logangwin.itemsplitter.gui.ConfigScreen;
 import net.logangwin.itemsplitter.logic.ItemSplitterUtils;
 import net.logangwin.itemsplitter.logic.RightClickHandler;
@@ -11,10 +10,8 @@ import net.logangwin.itemsplitter.logic.SplitScreenHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.render.state.GuiRenderState;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.render.GameRenderer;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
 import org.jetbrains.annotations.Nullable;
@@ -135,7 +132,7 @@ public abstract class HandledScreenMixin extends Screen {
 
                 int slotX = getItemSlotX(RightClickHandler.getTargetSlot());
                 int slotY = getItemSlotY(RightClickHandler.getTargetSlot());
-                GameRendererMixin gameRenderer = (GameRendererMixin) MinecraftClient.getInstance().gameRenderer;
+                GameRendererAccessor gameRenderer = (GameRendererAccessor) MinecraftClient.getInstance().gameRenderer;
                 ChargeCircleHud.drawProgressRing(gameRenderer.getGuiState(), slotX, slotY, progress, alpha);
             }
 
